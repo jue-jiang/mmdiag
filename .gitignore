@@ -1,0 +1,24 @@
+*.pyc
+*.pyo
+*.pcap
+*.pcapng
+
+# OSX file
+.DS_Store
+
+# Pickle output
+*.p
+*.pkl
+*.pickle
+
+# Object files
+*.so
+*.pyd
+
+# APK
+*.apk
+
+# Archive files
+*.7z
+*.zip
+*.tar*
