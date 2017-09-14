@@ -16,8 +16,6 @@ def get_sorted_logs(fileMi2logText):
     return content
 
 def parse_qmdl(plainTextFile):
-    # directory = "/home/moonsky219/ownCloud/mssn/misconfig_exp/data/Verizon/L714/"
-
     # Initialize an OfflineReplayer as monitor
     src = OfflineReplayer()
 
@@ -145,6 +143,6 @@ def parse_qmdl(plainTextFile):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print "Usage python MobilityMisConfig-analysis.py [plain text file containing path to mi2log files]"
+        print "Usage python main.py [plain text file containing path to mi2log files]"
         exit()
     parse_qmdl(sys.argv[1])
