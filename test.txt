@@ -1,0 +1,4 @@
+/home/moonsky219/ownCloud/mssn/misconfig_exp/data/T-Mobile/L708/L708_3g_diag_log_20161230_220753_867686020539332_Huawei-Nexus6P_T-Mobile.mi2log
+/home/moonsky219/ownCloud/mssn/misconfig_exp/data/T-Mobile/L708/L708_4g_diag_log_20161230_220058_867686020539332_Huawei-Nexus6P_T-Mobile.mi2log
+/home/moonsky219/ownCloud/mssn/misconfig_exp/data/T-Mobile/L708/L708_2g_diag_log_20161230_221239_867686020539332_Huawei-Nexus6P_T-Mobile.mi2log
+/home/moonsky219/ownCloud/mssn/misconfig_exp/data/T-Mobile/L708/L708_2g_diag_log_20170108_161329_353300061842826_samsung-SM-G900T_T-Mobile.mi2log
