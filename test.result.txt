@@ -1,163 +1,458 @@
-=========/home/moonsky219/ownCloud/mssn/misconfig_exp/data/T-Mobile/L708/L708_3g_diag_log_20161230_220753_867686020539332_Huawei-Nexus6P_T-Mobile.mi2log========
-(142, 776)
-lte_rrc_cerv_cell_info
-{'Uplink bandwidth': '5 MHz', 'type_id': 'LTE_RRC_Serv_Cell_Info', 'Allowed Access': 0, 'timestamp': datetime.datetime(2016, 12, 31, 3, 2, 33, 149227), 'log_msg_len': 41, 'TAC': 45057, 'MCC': 310, 'Cell Identity': 5673484, 'Version': 3, 'Downlink frequency': 776, 'Downlink bandwidth': '5 MHz', 'MNC Digit': 3, 'Uplink frequency': 18776, 'Cell ID': 142, 'MNC': 260, 'Band Indicator': 2}
-lte_measurement_report_config
-{'measObjectId': 1, 'measId': 1, 'reportConfigId': 1}
-{'measObjectId': 1, 'measId': 2, 'reportConfigId': 2}
-{'measObjectId': 1, 'measId': 7, 'reportConfigId': 3}
-{'measObjectId': 1, 'measId': 9, 'reportConfigId': 4}
-lte_measurement_object
-{'freq': 776, 'measobj_id': '1', 'cell_list': [], 'offsetFreq': 0}
-{'freq': 2050, 'measobj_id': '2', 'cell_list': [], 'offsetFreq': 0}
-lte_report_configuration
-{'hyst': 1.0, 'event_list': [{'event_type': 'a3', 'offset': 5.0}], 'report_id': '1'}
-{'hyst': 1.0, 'event_list': [{'threshold1': -112, 'threshold2': -111, 'event_type': 'a5'}], 'report_id': '2'}
-{'hyst': 1.0, 'event_list': [{'threshold': -109, 'event_type': 'a2'}], 'report_id': '3'}
-{'hyst': 0.0, 'event_list': [], 'report_id': '4'}
+=========/home/moonsky219/ownCloud/mssn/misconfig_exp/data/T-Mobile/L719/L719_2g_diag_log_20170101_170452_867686020539332_Huawei-Nexus6P_T-Mobile.mi2log========
+(79, 5035)
+{
+    "[sib5]InterFreqCarrierFreqInfo_element": [
+        {
+            "allowedMeasBandwidth": "mbw100", 
+            "cellReselectionPriority": "6", 
+            "dl_CarrierFreq": "2050", 
+            "p_Max": "24dBm", 
+            "q_RxLevMin": "-124dBm", 
+            "t_ReselectionEUTRA": "1s", 
+            "threshX_High": "8dB", 
+            "threshX_Low": "8dB"
+        }, 
+        {
+            "allowedMeasBandwidth": "mbw25", 
+            "cellReselectionPriority": "5", 
+            "dl_CarrierFreq": "776", 
+            "p_Max": "24dBm", 
+            "q_RxLevMin": "-124dBm", 
+            "t_ReselectionEUTRA": "1s", 
+            "threshX_High": "8dB", 
+            "threshX_Low": "8dB"
+        }
+    ], 
+    "lte_rrc_measurement_report": [
+        {
+            "lte-rrc.measId": "9", 
+            "lte-rrc.rsrpResult": -96, 
+            "lte-rrc.rsrqResult": -7.0
+        }
+    ]
+}
 -----------------------------------------------------------
-(15608280, 9765)
-3g_rrc_cerv_cell_info
-{'PLMN': '310-260', 'Cell ID': 15608280, 'LAC ID': 9598, 'UtraDLFreq': 9765, 'RAC ID': 2}
-{'PLMN': '310-260', 'Cell ID': 15608280, 'LAC ID': 9598, 'UtraDLFreq': 9765, 'RAC ID': 2}
-utra_ServingCell
-{'priority': '3', 'threshServingLow': 2, 's_PrioritySearch2': '2', 's_PrioritySearch1': 6}
-EUTRA_FrequencyAndPriorityInfo
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2075', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '776', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2050', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
+(420, 2050)
+{
+    "lte_rrc_cerv_cell_info": [
+        {
+            "Allowed Access": 0, 
+            "Band Indicator": 4, 
+            "Cell ID": 420, 
+            "Cell Identity": 5674754, 
+            "Downlink bandwidth": "20 MHz", 
+            "Downlink frequency": 2050, 
+            "MCC": 310, 
+            "MNC": 260, 
+            "MNC Digit": 3, 
+            "TAC": 45057, 
+            "Uplink bandwidth": "20 MHz", 
+            "Uplink frequency": 20050, 
+            "Version": 3, 
+            "log_msg_len": 41, 
+            "timestamp": "2017-09-15 18:04:12.868059", 
+            "type_id": "LTE_RRC_Serv_Cell_Info"
+        }
+    ]
+}
 -----------------------------------------------------------
-(15608285, 9784)
-event: e1b
-{'rrc.reportingInterval': 'noPeriodicalreporting', 'rrc.reportingRange': '12', 'per.optional_field_bit': '1', 'per.enum_index': '0', 'rrc.triggeringCondition': 'activeSetCellsOnly', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.periodicReportingInfo_1b_element': ''}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '12', 'per.optional_field_bit': '1', 'per.enum_index': '2', 'rrc.triggeringCondition': 'activeSetCellsOnly', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.periodicReportingInfo_1b_element': ''}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '12', 'per.optional_field_bit': '1', 'per.enum_index': '2', 'rrc.triggeringCondition': 'activeSetCellsOnly', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.periodicReportingInfo_1b_element': ''}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '12', 'per.optional_field_bit': '1', 'per.enum_index': '2', 'rrc.triggeringCondition': 'activeSetCellsOnly', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.periodicReportingInfo_1b_element': ''}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '12', 'per.optional_field_bit': '1', 'per.enum_index': '2', 'rrc.triggeringCondition': 'activeSetCellsOnly', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.periodicReportingInfo_1b_element': ''}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '12', 'per.optional_field_bit': '1', 'per.enum_index': '2', 'rrc.triggeringCondition': 'activeSetCellsOnly', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.periodicReportingInfo_1b_element': ''}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '12', 'per.optional_field_bit': '1', 'per.enum_index': '2', 'rrc.triggeringCondition': 'activeSetCellsOnly', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.periodicReportingInfo_1b_element': ''}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '12', 'per.optional_field_bit': '1', 'per.enum_index': '2', 'rrc.triggeringCondition': 'activeSetCellsOnly', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.periodicReportingInfo_1b_element': ''}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '12', 'per.optional_field_bit': '1', 'per.enum_index': '2', 'rrc.triggeringCondition': 'activeSetCellsOnly', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.periodicReportingInfo_1b_element': ''}
-event: e1c
-{'rrc.replacementActivationThreshold': 't3', 'per.enum_index': '2', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.reportingInterval': 'ri0-5'}
-{'rrc.replacementActivationThreshold': 't3', 'per.enum_index': '2', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.reportingInterval': 'ri0-5'}
-{'rrc.replacementActivationThreshold': 't3', 'per.enum_index': '2', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.reportingInterval': 'ri0-5'}
-{'rrc.replacementActivationThreshold': 't3', 'per.enum_index': '2', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.reportingInterval': 'ri0-5'}
-{'rrc.replacementActivationThreshold': 't3', 'per.enum_index': '2', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.reportingInterval': 'ri0-5'}
-{'rrc.replacementActivationThreshold': 't3', 'per.enum_index': '2', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.reportingInterval': 'ri0-5'}
-{'rrc.replacementActivationThreshold': 't3', 'per.enum_index': '2', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.reportingInterval': 'ri0-5'}
-{'rrc.replacementActivationThreshold': 't3', 'per.enum_index': '2', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.reportingInterval': 'ri0-5'}
-{'rrc.replacementActivationThreshold': 't3', 'per.enum_index': '2', 'rrc.reportingAmount': 'ra-Infinity', 'rrc.reportingInterval': 'ri0-5'}
-event: e1a
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '6', 'per.optional_field_bit': '0', 'per.enum_index': '2', 'rrc.triggeringCondition': 'detectedSetAndMonitoredSetCells', 'rrc.reportDeactivationThreshold': 't2', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity'}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '6', 'per.optional_field_bit': '0', 'per.enum_index': '2', 'rrc.triggeringCondition': 'detectedSetAndMonitoredSetCells', 'rrc.reportDeactivationThreshold': 't2', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity'}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '0', 'per.optional_field_bit': '0', 'per.enum_index': '2', 'rrc.triggeringCondition': 'detectedSetAndMonitoredSetCells', 'rrc.reportDeactivationThreshold': 't2', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity'}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '0', 'per.optional_field_bit': '0', 'per.enum_index': '2', 'rrc.triggeringCondition': 'detectedSetAndMonitoredSetCells', 'rrc.reportDeactivationThreshold': 't2', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity'}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '0', 'per.optional_field_bit': '0', 'per.enum_index': '2', 'rrc.triggeringCondition': 'detectedSetAndMonitoredSetCells', 'rrc.reportDeactivationThreshold': 't2', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity'}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '0', 'per.optional_field_bit': '0', 'per.enum_index': '2', 'rrc.triggeringCondition': 'detectedSetAndMonitoredSetCells', 'rrc.reportDeactivationThreshold': 't2', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity'}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '0', 'per.optional_field_bit': '0', 'per.enum_index': '2', 'rrc.triggeringCondition': 'detectedSetAndMonitoredSetCells', 'rrc.reportDeactivationThreshold': 't2', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity'}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '0', 'per.optional_field_bit': '0', 'per.enum_index': '2', 'rrc.triggeringCondition': 'detectedSetAndMonitoredSetCells', 'rrc.reportDeactivationThreshold': 't2', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity'}
-{'rrc.reportingInterval': 'ri0-5', 'rrc.reportingRange': '0', 'per.optional_field_bit': '0', 'per.enum_index': '2', 'rrc.triggeringCondition': 'detectedSetAndMonitoredSetCells', 'rrc.reportDeactivationThreshold': 't2', 'rrc.w': '0', 'rrc.reportingAmount': 'ra-Infinity'}
-3g_rrc_cerv_cell_info
-{'PLMN': '310-260', 'Cell ID': 15608285, 'LAC ID': 9598, 'UtraDLFreq': 9784, 'RAC ID': 2}
-{'PLMN': '310-260', 'Cell ID': 15608285, 'LAC ID': 9598, 'UtraDLFreq': 9784, 'RAC ID': 2}
-{'PLMN': '310-260', 'Cell ID': 15608285, 'LAC ID': 9598, 'UtraDLFreq': 9784, 'RAC ID': 2}
-{'PLMN': '310-260', 'Cell ID': 15608285, 'LAC ID': 9598, 'UtraDLFreq': 9784, 'RAC ID': 2}
-{'PLMN': '310-260', 'Cell ID': 15608285, 'LAC ID': 9598, 'UtraDLFreq': 9784, 'RAC ID': 2}
-{'PLMN': '310-260', 'Cell ID': 15608285, 'LAC ID': 9598, 'UtraDLFreq': 9784, 'RAC ID': 2}
-{'PLMN': '310-260', 'Cell ID': 15608285, 'LAC ID': 9598, 'UtraDLFreq': 9784, 'RAC ID': 2}
-{'PLMN': '310-260', 'Cell ID': 15608285, 'LAC ID': 9598, 'UtraDLFreq': 9784, 'RAC ID': 2}
-{'PLMN': '310-260', 'Cell ID': 15608285, 'LAC ID': 9598, 'UtraDLFreq': 9784, 'RAC ID': 2}
-{'PLMN': '310-260', 'Cell ID': 15608285, 'LAC ID': 9598, 'UtraDLFreq': 9784, 'RAC ID': 2}
-EUTRA_FrequencyAndPriorityInfo
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2075', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '776', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2050', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2075', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '776', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2050', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2075', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '776', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2050', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2075', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '776', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2050', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2075', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '776', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2050', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2075', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '776', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2050', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2075', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '776', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2050', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2075', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '776', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-{'priority': 6, 'threshXlow': 0, 'earfcn': '2050', 'threshXhigh': 6, 'qRxLevMinEUTRA': -124}
-utra_ServingCell
-{'priority': '3', 'threshServingLow': 2, 's_PrioritySearch2': '2', 's_PrioritySearch1': 6}
-{'priority': '3', 'threshServingLow': 2, 's_PrioritySearch2': '2', 's_PrioritySearch1': 6}
-{'priority': '3', 'threshServingLow': 2, 's_PrioritySearch2': '2', 's_PrioritySearch1': 6}
-{'priority': '3', 'threshServingLow': 2, 's_PrioritySearch2': '2', 's_PrioritySearch1': 6}
-{'priority': '3', 'threshServingLow': 2, 's_PrioritySearch2': '2', 's_PrioritySearch1': 6}
-{'priority': '3', 'threshServingLow': 2, 's_PrioritySearch2': '2', 's_PrioritySearch1': 6}
-{'priority': '3', 'threshServingLow': 2, 's_PrioritySearch2': '2', 's_PrioritySearch1': 6}
-{'priority': '3', 'threshServingLow': 2, 's_PrioritySearch2': '2', 's_PrioritySearch1': 6}
+=========/home/moonsky219/ownCloud/mssn/misconfig_exp/data/T-Mobile/L719/L719_2g_diag_log_20170107_161609_353300061842826_samsung-SM-G900T_T-Mobile.mi2log========
+=========/home/moonsky219/ownCloud/mssn/misconfig_exp/data/T-Mobile/L719/L719_4g_diag_log_20170101_165412_867686020539332_Huawei-Nexus6P_T-Mobile.mi2log========
+(420, 2050)
+{
+    "[sib3]cellReselectionInfoCommon_element": [
+        {
+            "q_Hyst": "dB2"
+        }
+    ], 
+    "[sib3]cellReselectionServingFreqInfo_element": [
+        {
+            "cellReselectionPriority": "6", 
+            "s_NonIntraSearch": "12dB", 
+            "threshServingLow": "2dB"
+        }
+    ], 
+    "[sib3]intraFreqCellReselectionInfo_element": [
+        {
+            "q_RxLevMin": "-124dBm", 
+            "s_IntraSearch": "46dB", 
+            "t_ReselectionEUTRA": "1s"
+        }
+    ], 
+    "[sib6]CarrierFreqUTRA_FDD_element": [
+        {
+            "carrierFreq": "9765", 
+            "cellReselectionPriority": "3", 
+            "lte_rrc_freq": 2050, 
+            "p_MaxUTRA": "24dBm", 
+            "q_QualMin": "-11dB", 
+            "q_RxLevMin": "-115dBm", 
+            "threshX_High": "4dB", 
+            "threshX_Low": "4dB"
+        }, 
+        {
+            "carrierFreq": "9784", 
+            "cellReselectionPriority": "3", 
+            "lte_rrc_freq": 2050, 
+            "p_MaxUTRA": "24dBm", 
+            "q_QualMin": "-11dB", 
+            "q_RxLevMin": "-115dBm", 
+            "threshX_High": "4dB", 
+            "threshX_Low": "4dB"
+        }, 
+        {
+            "carrierFreq": "1539", 
+            "cellReselectionPriority": "3", 
+            "lte_rrc_freq": 2050, 
+            "p_MaxUTRA": "24dBm", 
+            "q_QualMin": "-18dB", 
+            "q_RxLevMin": "-115dBm", 
+            "threshX_High": "4dB", 
+            "threshX_Low": "10dB"
+        }
+    ], 
+    "lte_rrc_cerv_cell_info": [
+        {
+            "Allowed Access": 0, 
+            "Band Indicator": 4, 
+            "Cell ID": 420, 
+            "Cell Identity": 5674754, 
+            "Downlink bandwidth": "20 MHz", 
+            "Downlink frequency": 2050, 
+            "MCC": 310, 
+            "MNC": 260, 
+            "MNC Digit": 3, 
+            "TAC": 45057, 
+            "Uplink bandwidth": "20 MHz", 
+            "Uplink frequency": 20050, 
+            "Version": 3, 
+            "log_msg_len": 41, 
+            "timestamp": "2017-09-15 18:04:13.692136", 
+            "type_id": "LTE_RRC_Serv_Cell_Info"
+        }, 
+        {
+            "Allowed Access": 0, 
+            "Band Indicator": 4, 
+            "Cell ID": 420, 
+            "Cell Identity": 5674754, 
+            "Downlink bandwidth": "20 MHz", 
+            "Downlink frequency": 2050, 
+            "MCC": 310, 
+            "MNC": 260, 
+            "MNC Digit": 3, 
+            "TAC": 45057, 
+            "Uplink bandwidth": "20 MHz", 
+            "Uplink frequency": 20050, 
+            "Version": 3, 
+            "log_msg_len": 41, 
+            "timestamp": "2017-09-15 18:04:14.478898", 
+            "type_id": "LTE_RRC_Serv_Cell_Info"
+        }
+    ], 
+    "lte_rrc_measurement_report": [
+        {
+            "lte-rrc.measId": "9", 
+            "lte-rrc.rsrpResult": -103, 
+            "lte-rrc.rsrqResult": -19.0
+        }, 
+        {
+            "lte-rrc.measId": "9", 
+            "lte-rrc.rsrpResult": -113, 
+            "lte-rrc.rsrqResult": -20.0
+        }, 
+        {
+            "lte-rrc.measId": "9", 
+            "lte-rrc.rsrpResult": -107, 
+            "lte-rrc.rsrqResult": -20.0
+        }, 
+        {
+            "lte-rrc.measId": "9", 
+            "lte-rrc.rsrpResult": -109, 
+            "lte-rrc.rsrqResult": -20.0
+        }
+    ], 
+    "plmn_Identity_element": [
+        {
+            "cell_id": 5674754, 
+            "plmn": "310-260", 
+            "tac": 45057
+        }
+    ]
+}
 -----------------------------------------------------------
-=========/home/moonsky219/ownCloud/mssn/misconfig_exp/data/T-Mobile/L708/L708_4g_diag_log_20161230_220058_867686020539332_Huawei-Nexus6P_T-Mobile.mi2log========
-(166, 2050)
-lte_rrc_cerv_cell_info
-{'Uplink bandwidth': '20 MHz', 'type_id': 'LTE_RRC_Serv_Cell_Info', 'Allowed Access': 0, 'timestamp': datetime.datetime(2016, 12, 31, 2, 57, 32, 988207), 'log_msg_len': 41, 'TAC': 45057, 'MCC': 310, 'Cell Identity': 5673474, 'Version': 3, 'Downlink frequency': 2050, 'Downlink bandwidth': '20 MHz', 'MNC Digit': 3, 'Uplink frequency': 20050, 'Cell ID': 166, 'MNC': 260, 'Band Indicator': 4}
-{'Uplink bandwidth': '20 MHz', 'type_id': 'LTE_RRC_Serv_Cell_Info', 'Allowed Access': 0, 'timestamp': datetime.datetime(2016, 12, 31, 2, 58, 46, 92101), 'log_msg_len': 41, 'TAC': 45057, 'MCC': 310, 'Cell Identity': 5673474, 'Version': 3, 'Downlink frequency': 2050, 'Downlink bandwidth': '20 MHz', 'MNC Digit': 3, 'Uplink frequency': 20050, 'Cell ID': 166, 'MNC': 260, 'Band Indicator': 4}
-{'Uplink bandwidth': '20 MHz', 'type_id': 'LTE_RRC_Serv_Cell_Info', 'Allowed Access': 0, 'timestamp': datetime.datetime(2016, 12, 31, 2, 58, 54, 420288), 'log_msg_len': 41, 'TAC': 45057, 'MCC': 310, 'Cell Identity': 5673474, 'Version': 3, 'Downlink frequency': 2050, 'Downlink bandwidth': '20 MHz', 'MNC Digit': 3, 'Uplink frequency': 20050, 'Cell ID': 166, 'MNC': 260, 'Band Indicator': 4}
-{'Uplink bandwidth': '20 MHz', 'type_id': 'LTE_RRC_Serv_Cell_Info', 'Allowed Access': 0, 'timestamp': datetime.datetime(2016, 12, 31, 2, 59, 9, 881487), 'log_msg_len': 41, 'TAC': 45057, 'MCC': 310, 'Cell Identity': 5673474, 'Version': 3, 'Downlink frequency': 2050, 'Downlink bandwidth': '20 MHz', 'MNC Digit': 3, 'Uplink frequency': 20050, 'Cell ID': 166, 'MNC': 260, 'Band Indicator': 4}
-{'Uplink bandwidth': '20 MHz', 'type_id': 'LTE_RRC_Serv_Cell_Info', 'Allowed Access': 0, 'timestamp': datetime.datetime(2016, 12, 31, 2, 59, 40, 877523), 'log_msg_len': 41, 'TAC': 45057, 'MCC': 310, 'Cell Identity': 5673474, 'Version': 3, 'Downlink frequency': 2050, 'Downlink bandwidth': '20 MHz', 'MNC Digit': 3, 'Uplink frequency': 20050, 'Cell ID': 166, 'MNC': 260, 'Band Indicator': 4}
-{'Uplink bandwidth': '20 MHz', 'type_id': 'LTE_RRC_Serv_Cell_Info', 'Allowed Access': 0, 'timestamp': datetime.datetime(2016, 12, 31, 2, 59, 57, 267500), 'log_msg_len': 41, 'TAC': 45057, 'MCC': 310, 'Cell Identity': 5673474, 'Version': 3, 'Downlink frequency': 2050, 'Downlink bandwidth': '20 MHz', 'MNC Digit': 3, 'Uplink frequency': 20050, 'Cell ID': 166, 'MNC': 260, 'Band Indicator': 4}
-[sib3]cellReselectionInfoCommon_element
-{'q_Hyst': 'dB2'}
-[sib3]cellReselectionServingFreqInfo_element
-{'threshServingLow': '2dB', 'cellReselectionPriority': '6', 's_NonIntraSearch': '8dB'}
-[sib3]intraFreqCellReselectionInfo_element
-{'t_ReselectionEUTRA': '1s', 's_IntraSearch': '46dB', 'q_RxLevMin': '-124dBm'}
-[sib5]InterFreqCarrierFreqInfo_element
-{'threshX_High': '8dB', 'q_RxLevMin': '-124dBm', 'allowedMeasBandwidth': 'mbw25', 't_ReselectionEUTRA': '1s', 'cellReselectionPriority': '5', 'threshX_Low': '8dB', 'dl_CarrierFreq': '776'}
-{'allowedMeasBandwidth': 'mbw25', 'threshX_High': '8dB', 'q_RxLevMin': '-124dBm', 'dl_CarrierFreq': '5035', 't_ReselectionEUTRA': '1s', 'cellReselectionPriority': '4', 'threshX_Low': '8dB', 'p_Max': '24dBm'}
-lte_rrc_measurement_report
-{'lte-rrc.measId': '9', 'lte-rrc.rsrqResult': -13.5, 'lte-rrc.rsrpResult': -74}
-{'lte-rrc.measId': '9', 'lte-rrc.rsrqResult': -20.0, 'lte-rrc.rsrpResult': -90}
-{'lte-rrc.measId': '9', 'lte-rrc.rsrqResult': -13.5, 'lte-rrc.rsrpResult': -75}
-{'lte-rrc.measId': '9', 'lte-rrc.rsrqResult': -15.5, 'lte-rrc.rsrpResult': -74}
-{'lte-rrc.measId': '9', 'lte-rrc.rsrqResult': -13.5, 'lte-rrc.rsrpResult': -83}
-lte_measurement_report_config
-{'measObjectId': 1, 'measId': 1, 'reportConfigId': 1}
-{'measObjectId': 1, 'measId': 2, 'reportConfigId': 2}
-{'measObjectId': 1, 'measId': 7, 'reportConfigId': 3}
-{'measObjectId': 1, 'measId': 9, 'reportConfigId': 4}
-{'measObjectId': 1, 'measId': 1, 'reportConfigId': 1}
-{'measObjectId': 1, 'measId': 2, 'reportConfigId': 2}
-{'measObjectId': 1, 'measId': 7, 'reportConfigId': 3}
-{'measObjectId': 1, 'measId': 9, 'reportConfigId': 4}
-lte_measurement_object
-{'freq': 2050, 'measobj_id': '1', 'cell_list': [{'cell_offset': -16, 'cell_id': 501}, {'cell_offset': -16, 'cell_id': 502}, {'cell_offset': -16, 'cell_id': 503}], 'offsetFreq': 0}
-{'freq': 776, 'measobj_id': '2', 'cell_list': [], 'offsetFreq': 0}
-{'freq': 2050, 'measobj_id': '1', 'cell_list': [{'cell_offset': -16, 'cell_id': 501}, {'cell_offset': -16, 'cell_id': 502}, {'cell_offset': -16, 'cell_id': 503}], 'offsetFreq': 0}
-{'freq': 776, 'measobj_id': '2', 'cell_list': [], 'offsetFreq': 0}
-lte_report_configuration
-{'hyst': 1.0, 'event_list': [{'event_type': 'a3', 'offset': 5.0}], 'report_id': '1'}
-{'hyst': 1.0, 'event_list': [{'threshold1': -114, 'threshold2': -113, 'event_type': 'a5'}], 'report_id': '2'}
-{'hyst': 1.0, 'event_list': [{'threshold': -119, 'event_type': 'a2'}], 'report_id': '3'}
-{'hyst': 0.0, 'event_list': [], 'report_id': '4'}
-{'hyst': 1.0, 'event_list': [{'event_type': 'a3', 'offset': 5.0}], 'report_id': '1'}
-{'hyst': 1.0, 'event_list': [{'threshold1': -114, 'threshold2': -113, 'event_type': 'a5'}], 'report_id': '2'}
-{'hyst': 1.0, 'event_list': [{'threshold': -119, 'event_type': 'a2'}], 'report_id': '3'}
-{'hyst': 0.0, 'event_list': [], 'report_id': '4'}
+(1, 749054500)
+{}
 -----------------------------------------------------------
-=========/home/moonsky219/ownCloud/mssn/misconfig_exp/data/T-Mobile/L708/L708_2g_diag_log_20161230_221239_867686020539332_Huawei-Nexus6P_T-Mobile.mi2log========
-(142, 776)
-[sib5]InterFreqCarrierFreqInfo_element
-{'threshX_High': '8dB', 'q_RxLevMin': '-124dBm', 'allowedMeasBandwidth': 'mbw100', 't_ReselectionEUTRA': '1s', 'cellReselectionPriority': '6', 'threshX_Low': '8dB', 'dl_CarrierFreq': '2050'}
-{'allowedMeasBandwidth': 'mbw25', 'threshX_High': '8dB', 'q_RxLevMin': '-124dBm', 'dl_CarrierFreq': '5035', 't_ReselectionEUTRA': '1s', 'cellReselectionPriority': '4', 'threshX_Low': '8dB', 'p_Max': '24dBm'}
-lte_rrc_measurement_report
-{'lte-rrc.measId': '9', 'lte-rrc.rsrqResult': -11.0, 'lte-rrc.rsrpResult': -76}
+=========/home/moonsky219/ownCloud/mssn/misconfig_exp/data/T-Mobile/L719/L719_3g_diag_log_20170101_165916_867686020539332_Huawei-Nexus6P_T-Mobile.mi2log========
+(420, 2050)
+{
+    "[sib3]cellReselectionInfoCommon_element": [
+        {
+            "q_Hyst": "dB2"
+        }
+    ], 
+    "[sib3]cellReselectionServingFreqInfo_element": [
+        {
+            "cellReselectionPriority": "6", 
+            "s_NonIntraSearch": "12dB", 
+            "threshServingLow": "2dB"
+        }
+    ], 
+    "[sib3]intraFreqCellReselectionInfo_element": [
+        {
+            "q_RxLevMin": "-124dBm", 
+            "s_IntraSearch": "46dB", 
+            "t_ReselectionEUTRA": "1s"
+        }
+    ], 
+    "[sib6]CarrierFreqUTRA_FDD_element": [
+        {
+            "carrierFreq": "9765", 
+            "cellReselectionPriority": "3", 
+            "lte_rrc_freq": 2050, 
+            "p_MaxUTRA": "24dBm", 
+            "q_QualMin": "-11dB", 
+            "q_RxLevMin": "-115dBm", 
+            "threshX_High": "4dB", 
+            "threshX_Low": "4dB"
+        }, 
+        {
+            "carrierFreq": "9784", 
+            "cellReselectionPriority": "3", 
+            "lte_rrc_freq": 2050, 
+            "p_MaxUTRA": "24dBm", 
+            "q_QualMin": "-11dB", 
+            "q_RxLevMin": "-115dBm", 
+            "threshX_High": "4dB", 
+            "threshX_Low": "4dB"
+        }, 
+        {
+            "carrierFreq": "1539", 
+            "cellReselectionPriority": "3", 
+            "lte_rrc_freq": 2050, 
+            "p_MaxUTRA": "24dBm", 
+            "q_QualMin": "-18dB", 
+            "q_RxLevMin": "-115dBm", 
+            "threshX_High": "4dB", 
+            "threshX_Low": "10dB"
+        }
+    ], 
+    "lte_rrc_cerv_cell_info": [
+        {
+            "Allowed Access": 0, 
+            "Band Indicator": 4, 
+            "Cell ID": 420, 
+            "Cell Identity": 5674754, 
+            "Downlink bandwidth": "20 MHz", 
+            "Downlink frequency": 2050, 
+            "MCC": 310, 
+            "MNC": 260, 
+            "MNC Digit": 3, 
+            "TAC": 45057, 
+            "Uplink bandwidth": "20 MHz", 
+            "Uplink frequency": 20050, 
+            "Version": 3, 
+            "log_msg_len": 41, 
+            "timestamp": "2017-09-15 18:04:14.613506", 
+            "type_id": "LTE_RRC_Serv_Cell_Info"
+        }
+    ], 
+    "plmn_Identity_element": [
+        {
+            "cell_id": 5674754, 
+            "plmn": "310-260", 
+            "tac": 45057
+        }
+    ]
+}
 -----------------------------------------------------------
-=========/home/moonsky219/ownCloud/mssn/misconfig_exp/data/T-Mobile/L708/L708_2g_diag_log_20170108_161329_353300061842826_samsung-SM-G900T_T-Mobile.mi2log========
+(76, 776)
+{
+    "lte_rrc_cerv_cell_info": [
+        {
+            "Allowed Access": 0, 
+            "Band Indicator": 2, 
+            "Cell ID": 76, 
+            "Cell Identity": 8390670, 
+            "Downlink bandwidth": "5 MHz", 
+            "Downlink frequency": 776, 
+            "MCC": 310, 
+            "MNC": 260, 
+            "MNC Digit": 3, 
+            "TAC": 45057, 
+            "Uplink bandwidth": "5 MHz", 
+            "Uplink frequency": 18776, 
+            "Version": 3, 
+            "log_msg_len": 41, 
+            "timestamp": "2017-09-15 18:04:14.563466", 
+            "type_id": "LTE_RRC_Serv_Cell_Info"
+        }
+    ]
+}
+-----------------------------------------------------------
+(15608434, 9784)
+{
+    "3g_rrc_cerv_cell_info": [
+        {
+            "Cell ID": 15608434, 
+            "LAC ID": 9598, 
+            "PLMN": "310-260", 
+            "RAC ID": 2, 
+            "UtraDLFreq": 9784
+        }
+    ], 
+    "cellSelectReselectInfo": [
+        {
+            "q_HYST_2_S": 2, 
+            "q_Hyst_1_S": 2, 
+            "q_QualMin": -18, 
+            "q_RxlevMin": -116, 
+            "s_Intersearch": 8, 
+            "s_Intrasearch": 10, 
+            "t_Reselection_S": "1"
+        }
+    ], 
+    "event: e1a": [
+        {
+            "per.enum_index": "2", 
+            "per.optional_field_bit": "0", 
+            "rrc.reportDeactivationThreshold": "t2", 
+            "rrc.reportingAmount": "ra-Infinity", 
+            "rrc.reportingInterval": "ri0-5", 
+            "rrc.reportingRange": "0", 
+            "rrc.triggeringCondition": "detectedSetAndMonitoredSetCells", 
+            "rrc.w": "0"
+        }
+    ], 
+    "event: e1b": [
+        {
+            "per.enum_index": "2", 
+            "per.optional_field_bit": "1", 
+            "rrc.periodicReportingInfo_1b_element": "", 
+            "rrc.reportingAmount": "ra-Infinity", 
+            "rrc.reportingInterval": "ri0-5", 
+            "rrc.reportingRange": "12", 
+            "rrc.triggeringCondition": "activeSetCellsOnly", 
+            "rrc.w": "0"
+        }
+    ], 
+    "event: e1c": [
+        {
+            "per.enum_index": "2", 
+            "rrc.replacementActivationThreshold": "t3", 
+            "rrc.reportingAmount": "ra-Infinity", 
+            "rrc.reportingInterval": "ri0-5"
+        }
+    ]
+}
+-----------------------------------------------------------
+(15608429, 9765)
+{
+    "3g_rrc_cerv_cell_info": [
+        {
+            "Cell ID": 15608429, 
+            "LAC ID": 9598, 
+            "PLMN": "310-260", 
+            "RAC ID": 2, 
+            "UtraDLFreq": 9765
+        }
+    ], 
+    "event: e1a": [
+        {
+            "per.enum_index": "2", 
+            "per.optional_field_bit": "0", 
+            "rrc.reportDeactivationThreshold": "t2", 
+            "rrc.reportingAmount": "ra-Infinity", 
+            "rrc.reportingInterval": "ri0-5", 
+            "rrc.reportingRange": "6", 
+            "rrc.triggeringCondition": "detectedSetAndMonitoredSetCells", 
+            "rrc.w": "0"
+        }, 
+        {
+            "per.enum_index": "2", 
+            "per.optional_field_bit": "0", 
+            "rrc.reportDeactivationThreshold": "t2", 
+            "rrc.reportingAmount": "ra-Infinity", 
+            "rrc.reportingInterval": "ri0-5", 
+            "rrc.reportingRange": "0", 
+            "rrc.triggeringCondition": "detectedSetAndMonitoredSetCells", 
+            "rrc.w": "0"
+        }
+    ], 
+    "event: e1b": [
+        {
+            "per.enum_index": "0", 
+            "per.optional_field_bit": "1", 
+            "rrc.periodicReportingInfo_1b_element": "", 
+            "rrc.reportingAmount": "ra-Infinity", 
+            "rrc.reportingInterval": "noPeriodicalreporting", 
+            "rrc.reportingRange": "12", 
+            "rrc.triggeringCondition": "activeSetCellsOnly", 
+            "rrc.w": "0"
+        }, 
+        {
+            "per.enum_index": "2", 
+            "per.optional_field_bit": "1", 
+            "rrc.periodicReportingInfo_1b_element": "", 
+            "rrc.reportingAmount": "ra-Infinity", 
+            "rrc.reportingInterval": "ri0-5", 
+            "rrc.reportingRange": "12", 
+            "rrc.triggeringCondition": "activeSetCellsOnly", 
+            "rrc.w": "0"
+        }
+    ], 
+    "event: e1c": [
+        {
+            "per.enum_index": "2", 
+            "rrc.replacementActivationThreshold": "t3", 
+            "rrc.reportingAmount": "ra-Infinity", 
+            "rrc.reportingInterval": "ri0-5"
+        }
+    ]
+}
+-----------------------------------------------------------
+(15607621, 9765)
+{
+    "3g_rrc_cerv_cell_info": [
+        {
+            "Cell ID": 15607621, 
+            "LAC ID": 9598, 
+            "PLMN": "310-260", 
+            "RAC ID": 2, 
+            "UtraDLFreq": 9765
+        }
+    ], 
+    "event: e1a": [
+        {
+            "per.enum_index": "2", 
+            "per.optional_field_bit": "0", 
+            "rrc.reportDeactivationThreshold": "t2", 
+            "rrc.reportingAmount": "ra-Infinity", 
+            "rrc.reportingInterval": "ri0-5", 
+            "rrc.reportingRange": "0", 
+            "rrc.triggeringCondition": "detectedSetAndMonitoredSetCells", 
+            "rrc.w": "0"
+        }
+    ], 
+    "event: e1b": [
+        {
+            "per.enum_index": "2", 
+            "per.optional_field_bit": "1", 
+            "rrc.periodicReportingInfo_1b_element": "", 
+            "rrc.reportingAmount": "ra-Infinity", 
+            "rrc.reportingInterval": "ri0-5", 
+            "rrc.reportingRange": "12", 
+            "rrc.triggeringCondition": "activeSetCellsOnly", 
+            "rrc.w": "0"
+        }
+    ], 
+    "event: e1c": [
+        {
+            "per.enum_index": "2", 
+            "rrc.replacementActivationThreshold": "t3", 
+            "rrc.reportingAmount": "ra-Infinity", 
+            "rrc.reportingInterval": "ri0-5"
+        }
+    ]
+}
+-----------------------------------------------------------

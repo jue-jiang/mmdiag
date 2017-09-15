@@ -831,6 +831,13 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 elif val.get("name") == "lte-rrc.cellIdentity":
                     cell_info["cell_id"] = int(val.get("value"), base=16) / 16
 
+            if cell_info['cell_id'] != None:
+                if "plmn_Identity_element" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)].keys():
+                    if cell_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["plmn_Identity_element"]:
+                        self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["plmn_Identity_element"].append(cell_info)
+                else:
+                    self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["plmn_Identity_element"] = [cell_info]
+
         elif log_item["PDU Number"] == 6 or log_item["PDU Number"] == 13: # LTE-RRC_DL_DCCH
             for val in log_xml.iter("field"):
                 if val.get("name") == "lte-rrc.rrcConnectionReconfiguration_element":
