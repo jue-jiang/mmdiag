@@ -410,14 +410,25 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 field_val['rrc.q_Hyst_l_S'] = None #mandatory
                 field_val['rrc.t_Reselection_S'] = None #mandatory
                 field_val['rrc.q_HYST_2_S'] = None #optional, default=q_Hyst_l_S
+                field_val['rat_List'] = []
 
-                #TODO: handle rrc.RAT_FDD_Info_element (p1530, TS25.331)
-                #s-SearchRAT is the RAT-specific threshserv
+                # handle rrc.RAT_FDD_Info_element (p1530, TS25.331)
+                # s-SearchRAT is the RAT-specific threshserv
+                for val in field.iter('field'):
+                    if val.get('name') == 'rrc.RAT_FDD_Info_element':
+                        rat_info = {}
+                        for item in val.iter('field'):
+                            if item.get('name') == 'rrc.rat_Identifier':
+                                rat_info[item.get('name')] = item.get('showname').split(': ')[1]
+                            elif item.get("name") == "rrc.s_SearchRAT" or item.get("name") == "rrc.s_Limit_SearchRAT":
+                                rat_info[item.get('name')] = int(item.get('show'))
+                            elif item.get("name") == "rrc.s_HCS_RAT":
+                                rat_info[item.get('name')] = int(item.get('show')) * 2
+                        field_val['rat_List'].append(rat_info)
+                    else:
+                        field_val[val.get('name')] = val.get('show')
 
                 #TODO: handle FDD and TDD
-
-                for val in field.iter('field'):
-                    field_val[val.get('name')] = val.get('show')
 
                 #TS25.331: if qHyst-2s is missing, the default is qHyst-1s
                 if not field_val['rrc.q_HYST_2_S']:
@@ -433,7 +444,9 @@ class MobilityMisconfigAnalyzer(Analyzer):
                         "s_Intersearch":int(field_val['rrc.s_Intersearch'])*2,\
                         "s_Intrasearch":int(field_val['rrc.s_Intrasearch'])*2,\
                         "q_Hyst_1_S":int(field_val['rrc.q_Hyst_l_S'])*2,\
-                        "q_HYST_2_S":int(field_val['rrc.q_HYST_2_S'])*2\
+                        "q_HYST_2_S":int(field_val['rrc.q_HYST_2_S'])*2,\
+                        "maxAllowedUL_Tx_Power":int(field_val['rrc.maxAllowedUL_TX_Power']),\
+                        "rat_List":field_val['rat_List']\
                         }
                 if info3g not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["cellSelectReselectInfo"]:
                     self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["cellSelectReselectInfo"].append(info3g)
