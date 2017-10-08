@@ -19,10 +19,10 @@ def get_sorted_logs(fileMi2logText):
 def parse_qmdl(plainTextFile):
     # Initialize an OfflineReplayer as monitor
     src = OfflineReplayer()
+    m = MobilityMisconfigAnalyzer()
 
     for f in get_sorted_logs(plainTextFile):
         print '=========' + f + '========'
-        m = MobilityMisconfigAnalyzer()
         m.reset()
         m.set_source(src)
         src.set_input_path(f)

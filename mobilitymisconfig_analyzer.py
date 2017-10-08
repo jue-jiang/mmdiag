@@ -197,6 +197,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
         # Deal with out-of-order timestamps
         this_ts = log_item["timestamp"]
+        if isinstance(this_ts, basestring):
+            print log_item
         if this_ts.year != 1980:    # Ignore undefined timestamp
             if self.__last_valid_timestamp:
                 sec = (this_ts - self.__last_valid_timestamp).total_seconds()
@@ -1348,7 +1350,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
             self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)] = {}
         if "lte_rrc_cerv_cell_info" not in self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)]:
             self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)]["lte_rrc_cerv_cell_info"] = []
-        log_item['timestamp'] = str(log_item['timestamp'].now())
+        log_item['timestamp'] = str(log_item['timestamp'])
         self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)]["lte_rrc_cerv_cell_info"].append(log_item)
         self.__last_CellID = CellID
         self.__last_DLFreq = DLFreq
