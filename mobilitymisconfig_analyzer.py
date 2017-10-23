@@ -407,6 +407,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 #default value based on TS25.331
                 field_val['rrc.s_Intrasearch'] = 0
                 field_val['rrc.s_Intersearch'] = 0
+                field_val['rrc.s_SearchHCS'] = 0
                 field_val['rrc.q_RxlevMin'] = None #mandatory
                 field_val['rrc.q_QualMin'] = None #mandatory
                 field_val['rrc.q_Hyst_l_S'] = None #mandatory
@@ -445,6 +446,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
                         "q_QualMin":int(field_val['rrc.q_QualMin']),\
                         "s_Intersearch":int(field_val['rrc.s_Intersearch'])*2,\
                         "s_Intrasearch":int(field_val['rrc.s_Intrasearch'])*2,\
+                        "s_SearchHCS":int(field_val['rrc.s_SearchHCS'])*2,\
                         "q_Hyst_1_S":int(field_val['rrc.q_Hyst_l_S'])*2,\
                         "q_HYST_2_S":int(field_val['rrc.q_HYST_2_S'])*2,\
                         "maxAllowedUL_Tx_Power":int(field_val['rrc.maxAllowedUL_TX_Power']),\
@@ -485,7 +487,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
             #-------------3G-Measurement Report Event--------------------------
 
-            if field.get('name') == "rrc.e1a_element":
+            if field.get('name') == "rrc.event" and "e1a" in field.get('showname'):
                 field_val = {}
 
                 for val in field.iter('field'):
@@ -502,7 +504,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1a"].append(field_val)
 
 
-            if field.get('name') == "rrc.e1b_element":
+            if field.get('name') == "rrc.event" and "e1b" in field.get('showname'):
                 field_val = {}
 
                 for val in field.iter('field'):
@@ -519,7 +521,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1b"]:
                     self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1b"].append(field_val)
 
-            if field.get('name') == "rrc.e1c_element":
+            if field.get('name') == "rrc.event" and "e1c" in field.get('showname'):
                 field_val = {}
 
                 for val in field.iter('field'):
@@ -536,7 +538,27 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1c"]:
                     self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1c"].append(field_val)
 
-            if field.get('name') == "rrc.e1d_element":
+            if "rrc.IntraFreqEvent" in field.get('name'):
+                findE1D = False
+                field_val = {}
+                for val in field.iter('field'):
+                    if val.get('name') == "rrc.event" and "e1d" in val.get('showname'):
+                        findE1D = True
+                    if "rrc.e1d_element" == val.get('name'):
+                        continue
+                    if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
+                        field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
+                    else:
+                        field_val[val.get('name')] = val.get('show')
+
+                if findE1D:
+                    if "event: e1d" not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId, self.__last_3g_UtraDLFreq)].keys():
+                        self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1d"] = []
+
+                    if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1d"]:
+                        self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1d"].append(field_val)
+
+            if field.get('name') == "rrc.event" and "e1e" in field.get('showname'):
                 field_val = {}
 
                 for val in field.iter('field'):
@@ -547,11 +569,64 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     else:
                         field_val[val.get('name')] = val.get('show')
 
-                if "event: e1d" not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId, self.__last_3g_UtraDLFreq)].keys():
-                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1d"] = []
+                if "event: e1e" not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId, self.__last_3g_UtraDLFreq)].keys():
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1e"] = []
 
-                if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1d"]:
-                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1d"].append(field_val)
+                if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1e"]:
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1e"].append(field_val)
+
+            if field.get('name') == "rrc.event" and "e1f" in field.get('showname'):
+                field_val = {}
+
+                for val in field.iter('field'):
+                    if val.get('name') == field.get('name'):
+                        continue
+                    if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
+                        field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
+                    else:
+                        field_val[val.get('name')] = val.get('show')
+
+                if "event: e1f" not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId, self.__last_3g_UtraDLFreq)].keys():
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1f"] = []
+
+                if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1f"]:
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1f"].append(field_val)
+
+            if field.get('name') == "rrc.event" and "e1j" in field.get('showname'):
+                field_val = {}
+
+                for val in field.iter('field'):
+                    if val.get('name') == field.get('name'):
+                        continue
+                    if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
+                        field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
+                    else:
+                        field_val[val.get('name')] = val.get('show')
+
+                if "event: e1j" not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId, self.__last_3g_UtraDLFreq)].keys():
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1j"] = []
+
+                if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1j"]:
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: e1j"].append(field_val)
+
+            if field.get('name') == "rrc.event2a_element":
+                field_val = {}
+
+                for val in field.iter('field'):
+                    if val.get('name') == field.get('name'):
+                        continue
+                    if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
+                        field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
+                        # print val.get('name') + "|" + (val.get('showname')).split(' ')[1]
+                    else:
+                        field_val[val.get('name')] = val.get('show')
+                        # print val.get('name') + "|" + val.get('showname')
+
+                if "event: 2a" not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId, self.__last_3g_UtraDLFreq)].keys():
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2a"] = []
+
+                if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2a"]:
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2a"].append(field_val)
 
             if field.get('name') == "rrc.event2b_element":
                 field_val = {}
@@ -572,6 +647,25 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2b"]:
                     self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2b"].append(field_val)
 
+            if field.get('name') == "rrc.event2c_element":
+                field_val = {}
+
+                for val in field.iter('field'):
+                    if val.get('name') == field.get('name'):
+                        continue
+                    if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
+                        field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
+                        # print val.get('name') + "|" + (val.get('showname')).split(' ')[1]
+                    else:
+                        field_val[val.get('name')] = val.get('show')
+                        # print val.get('name') + "|" + val.get('showname')
+
+                if "event: 2c" not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId, self.__last_3g_UtraDLFreq)].keys():
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2c"] = []
+
+                if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2c"]:
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2c"].append(field_val)
+
             if field.get('name') == "rrc.event2d_element":
                 field_val = {}
 
@@ -591,6 +685,25 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2d"]:
                     self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2d"].append(field_val)
 
+            if field.get('name') == "rrc.event2e_element":
+                field_val = {}
+
+                for val in field.iter('field'):
+                    if val.get('name') == field.get('name'):
+                        continue
+                    if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
+                        field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
+                        # print val.get('name') + "|" + (val.get('showname')).split(' ')[1]
+                    else:
+                        field_val[val.get('name')] = val.get('show')
+                        # print val.get('name') + "|" + val.get('showname')
+
+                if "event: 2e" not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId, self.__last_3g_UtraDLFreq)].keys():
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2e"] = []
+
+                if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2e"]:
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2e"].append(field_val)
+
             if field.get('name') == "rrc.event2f_element":
                 field_val = {}
 
@@ -609,6 +722,25 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
                 if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2f"]:
                     self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2f"].append(field_val)
+
+            if field.get('name') == "rrc.event2g_element":
+                field_val = {}
+
+                for val in field.iter('field'):
+                    if val.get('name') == field.get('name'):
+                        continue
+                    if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
+                        field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
+                        # print val.get('name') + "|" + (val.get('showname')).split(' ')[1]
+                    else:
+                        field_val[val.get('name')] = val.get('show')
+                        # print val.get('name') + "|" + val.get('showname')
+
+                if "event: 2g" not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId, self.__last_3g_UtraDLFreq)].keys():
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2g"] = []
+
+                if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2g"]:
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["event: 2g"].append(field_val)
 
     def __callback_wcdma_rrc_ota_mib(self, event, mib):
         log_item = event.data
