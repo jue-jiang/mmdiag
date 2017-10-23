@@ -544,8 +544,6 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 for val in field.iter('field'):
                     if val.get('name') == "rrc.event" and "e1d" in val.get('showname'):
                         findE1D = True
-                    if "rrc.e1d_element" == val.get('name'):
-                        continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
                     else:
