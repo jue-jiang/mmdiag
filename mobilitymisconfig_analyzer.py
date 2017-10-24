@@ -331,14 +331,16 @@ class MobilityMisconfigAnalyzer(Analyzer):
         self.__last_3g_newMsg_mnc = None
         self.__last_3g_newMsg_cellId = None
 
-
         mib = None
         sib3 = None
+        sib11 = None
         for val in log_xml.iter("field"):
             if val.get("name") == "rrc.MasterInformationBlock_element":
                 mib = val
             if val.get("name") == "rrc.SysInfoType3_element":
                 sib3 = val
+            if val.get("name") == "rrc.SysInfoType11_element":
+                sib11 = val
 
         if mib is not None:
             self.__callback_wcdma_rrc_ota_mib(event, mib)
@@ -374,6 +376,9 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 return
 
         #----------------------------------------------------------------------
+        if sib11 is not None:
+            self.__callback_wcdma_rrc_ota_sib11(event, sib11)
+
         for field in log_xml.iter('field'):
             if field.get('name') == "rrc.utra_ServingCell_element":
                 field_val = {}
@@ -781,6 +786,118 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
         if cell_id:
             self.__add_plmn_search_cell(cell_id, log_item)
+
+    def __callback_wcdma_rrc_ota_sib11(self, event, sib11):
+        Pattern1 = re.compile(r": (.*) \([-\d]+\)$")
+        Pattern2 = re.compile(r": (.*)$")
+        patternIntraElement = re.compile(r"rrc.NewIntraFreqCellSI(.*)element$")
+        patternInterElement = re.compile(r"rrc.NewInterFreqCellSI(.*)element$")
+        cellSelectQualityMeasure = "Unknown"
+
+        for field in sib11.iter('field'):
+            if field.get('name') == "rrc.cellSelectQualityMeasure":
+                cellSelectQualityMeasure = re.findall(Pattern1, field.get('showname'))[0]
+                continue
+
+            # Intra Freq Cells
+            if patternInterElement.match(field.get('name')) is not None:
+                field_val = {}
+                findSelectInfo = False
+                #Default value setting
+                field_val['rrc.primaryScramblingCode'] = "Not present"
+                field_val['rrc.q_Offset1S_N'] = "Not present"
+                field_val['rrc.q_Offset2S_N'] = "Not present"
+                field_val['rrc.modeSpecificInfo'] = "Not present"
+                field_val['rrc.q_RxlevMin'] = "Not present"
+                field_val['rrc.q_QualMin'] = "Not present"
+                field_val['rrc.maxAllowedUL_TX_Power'] = "Not present"
+
+                for attr in field.iter('field'):
+                    s = attr.get("showname")
+                    if attr.get("name") == "rrc.cellSelectionReselectionInfo_element":
+                        findSelectInfo = True
+                    elif attr.get("name") in ("rrc.primaryScramblingCode", "rrc.q_Offset1S_N", "rrc.q_Offset2S_N", "rrc.maxAllowedUL_TX_Power"):
+                        field_val[attr.get("name")] = int(re.findall(Pattern2, s)[0])
+                    elif attr.get("name") in ("rrc.modeSpecificInfo"):
+                        field_val[attr.get("name")] = re.findall(Pattern1, s)[0]
+                    elif attr.get("name") in ("rrc.q_RxlevMin"):
+                        field_val[attr.get("name")] = int(re.findall(Pattern2, s)[0]) * 2
+                field_val["rrc.cellSelectQualityMeasure"] = cellSelectQualityMeasure
+                if not findSelectInfo:
+                    continue
+                if "intraFreqCell" not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)].keys():
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["intraFreqCell"] = []
+
+                if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["intraFreqCell"]:
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["intraFreqCell"].append(field_val)
+
+            # Inter Freq Cells not observed yet
+            if patternIntraElement.match(field.get('name')) is not None:
+                field_val = {}
+                findSelectInfo = False
+                #Default value setting
+                field_val['rrc.uarfcn_DL'] = "Not present"
+                field_val['rrc.primaryScramblingCode'] = "Not present"
+                field_val['rrc.q_Offset1S_N'] = "Not present"
+                field_val['rrc.q_Offset2S_N'] = "Not present"
+                field_val['rrc.modeSpecificInfo'] = "Not present"
+                field_val['rrc.q_RxlevMin'] = "Not present"
+                field_val['rrc.q_QualMin'] = "Not present"
+                field_val['rrc.maxAllowedUL_TX_Power'] = "Not present"
+
+                for attr in field.iter('field'):
+                    s = attr.get("showname")
+                    if attr.get("name") == "rrc.cellSelectionReselectionInfo_element":
+                        findSelectInfo = True
+                    elif attr.get("name") in ("rrc.uarfcn_DL", "rrc.primaryScramblingCode", "rrc.q_Offset1S_N", "rrc.q_Offset2S_N", "rrc.maxAllowedUL_TX_Power"):
+                        field_val[attr.get("name")] = int(re.findall(Pattern2, s)[0])
+                    elif attr.get("name") in ("rrc.modeSpecificInfo"):
+                        field_val[attr.get("name")] = re.findall(Pattern1, s)[0]
+                    elif attr.get("name") in ("rrc.q_RxlevMin"):
+                        field_val[attr.get("name")] = int(re.findall(Pattern2, s)[0]) * 2
+                field_val["rrc.cellSelectQualityMeasure"] = cellSelectQualityMeasure
+                if not findSelectInfo:
+                    continue
+                if "interFreqCell" not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)].keys():
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["interFreqCell"] = []
+
+                if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["interFreqCell"]:
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["interFreqCell"].append(field_val)
+
+            # Inter RAT Cells info (For GSM only)
+            if "rrc.NewInterRATCell_B_element" == field.get('name'):
+                field_val = {}
+                findSelectInfo = False
+                #Default value setting
+                field_val['rrc.q_Offset1S_N'] = "Not present"
+                field_val['rrc.q_Offset2S_N'] = "Not present"
+                field_val['rrc.modeSpecificInfo'] = "Not present"
+                field_val['rrc.q_RxlevMin'] = "Not present"
+                field_val['rrc.q_QualMin'] = "Not present"
+                field_val['rrc.maxAllowedUL_TX_Power'] = "Not present"
+                field_val['rrc.ncc'] = "Not present"
+                field_val['rrc.bcc'] = "Not present"
+                field_val['rrc.frequency_band'] = "Not present"
+                field_val['rrc.bcch_ARFCN'] = "Not present"
+
+                for attr in field.iter('field'):
+                    s = attr.get("showname")
+                    if attr.get("name") == "rrc.cellSelectionReselectionInfo_element":
+                        findSelectInfo = True
+                    elif attr.get("name") in ("rrc.ncc", "rrc.bcc", "rrc.bcch_ARFCN", "rrc.q_Offset1S_N", "rrc.q_Offset2S_N", "rrc.maxAllowedUL_TX_Power"):
+                        field_val[attr.get("name")] = int(re.findall(Pattern2, s)[0])
+                    elif attr.get("name") in ("rrc.frequency_band", "rrc.modeSpecificInfo"):
+                        field_val[attr.get("name")] = re.findall(Pattern1, s)[0]
+                    elif attr.get("name") in ("rrc.q_RxlevMin"):
+                        field_val[attr.get("name")] = int(re.findall(Pattern2, s)[0]) * 2
+                field_val["rrc.cellSelectQualityMeasure"] = cellSelectQualityMeasure
+                if not findSelectInfo:
+                    continue
+                if "interRATCell" not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)].keys():
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["interRATCell"] = []
+
+                if field_val not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["interRATCell"]:
+                    self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["interRATCell"].append(field_val)
 
     def __callback_umts_nas(self, event):
         log_item = event.data
