@@ -800,7 +800,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 continue
 
             # Intra Freq Cells
-            if patternInterElement.match(field.get('name')) is not None:
+            if patternIntraElement.match(field.get('name')) is not None:
                 field_val = {}
                 findSelectInfo = False
                 #Default value setting
@@ -832,7 +832,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["intraFreqCell"].append(field_val)
 
             # Inter Freq Cells not observed yet
-            if patternIntraElement.match(field.get('name')) is not None:
+            if patternInterElement.match(field.get('name')) is not None:
                 field_val = {}
                 findSelectInfo = False
                 #Default value setting
@@ -1354,7 +1354,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     if field.get('name') == "lte-rrc.measObjectEUTRA_element":
                         field_val = {}
 
-                        field_val['lte-rrc.carrierFreq'] = None
+                        field_val['lte-rrc.carrierFreq'] = 0
                         field_val['lte-rrc.offsetFreq'] = 0
 
                         for val in field.iter('field'):
