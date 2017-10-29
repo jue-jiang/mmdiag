@@ -455,8 +455,9 @@ class MobilityMisconfigAnalyzer(Analyzer):
                         "q_Hyst_1_S":int(field_val['rrc.q_Hyst_l_S'])*2,\
                         "q_HYST_2_S":int(field_val['rrc.q_HYST_2_S'])*2,\
                         "maxAllowedUL_Tx_Power":int(field_val['rrc.maxAllowedUL_TX_Power']),\
-                        "rat_List":field_val['rat_List']\
                         }
+                for x in field_val['rat_List']:
+                    info3g.update(x)
                 if info3g not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["cellSelectReselectInfo"]:
                     self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["cellSelectReselectInfo"].append(info3g)
 
