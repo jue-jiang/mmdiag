@@ -955,14 +955,26 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 "PLMN":self.__last_3g_plmn,\
                 "UtraDLFreq":self.__last_3g_UtraDLFreq,\
                 "LAC ID":self.__last_3g_LAC_id,\
-                "RAC ID":self.__last_3g_RAC_id}
+                "RAC ID":self.__last_3g_RAC_id,\
+                "timestamp":str(log_item['timestamp'])}
+
         # print (self.__last_3g_plmn,self.__last_3g_UtraDLFreq,self.__last_3g_cellId,self.__last_3g_LAC_id,self.__last_3g_RAC_id)
-        if (self.__last_3g_cellId,self.__last_3g_UtraDLFreq) in self.__3g_mobility_misconfig_serving_cell_dict.keys():
-            if wcdma_cell_info not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["3g_rrc_cerv_cell_info"]:
-                self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["3g_rrc_cerv_cell_info"].append(wcdma_cell_info)
-        else:
+        if (self.__last_3g_cellId,self.__last_3g_UtraDLFreq) not in self.__3g_mobility_misconfig_serving_cell_dict.keys():
             self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)] = {}
-            self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["3g_rrc_cerv_cell_info"] = [wcdma_cell_info]
+            self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["3g_rrc_cerv_cell_info"] = []
+
+        if "umts_geolocation" not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]:
+            radio = "UMTS"
+            mcc = str(int(self.__last_3g_plmn.split('-')[0]))
+            net = str(int(self.__last_3g_plmn.split('-')[1]))
+            area = str(self.__last_3g_LAC_id)
+            cell = str(self.__last_3g_cellId)
+            output = subprocess.check_output(['python', '/home/deng164/milab-server/manage.py', 'query', radio, mcc, net, area, cell])
+            self.__last_3g_geolocation = ast.literal_eval(output)
+            self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["umts_geolocation"] = self.__last_3g_geolocation
+        wcdma_cell_info.update(self.__last_3g_geolocation)
+        if wcdma_cell_info not in self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["3g_rrc_cerv_cell_info"]:
+            self.__3g_mobility_misconfig_serving_cell_dict[(self.__last_3g_cellId,self.__last_3g_UtraDLFreq)]["3g_rrc_cerv_cell_info"].append(wcdma_cell_info)
 
     def __callback_lte_nas_emm(self, event):
         log_item = event.data
