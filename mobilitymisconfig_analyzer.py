@@ -7,7 +7,8 @@ Author: Jiayao Li
 """
 
 from mobile_insight.analyzer.analyzer import *
-
+import ast
+import subprocess
 import xml.etree.ElementTree as ET
 import datetime
 import re
@@ -362,7 +363,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 del self.__last_3g_RAC_id
                 del self.__last_3g_UtraDLFreq
                 return
-        if self.__last_3g_newMsg_mcc is not None:
+        if self.__last_3g_newMsg_mcc is not None and self.__last_3g_newMsg_mnc is not None:
             temp = self.__last_3g_newMsg_mcc + '-' + self.__last_3g_newMsg_mnc
             if temp != self.__last_3g_plmn:
                 # print "Something changed"
@@ -380,9 +381,9 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
                 #Default value setting
                 #FIXME: set default to those in TS25.331
-                field_val['rrc.priority'] = None    #mandatory
-                field_val['rrc.threshServingLow'] = None    #mandatory
-                field_val['rrc.s_PrioritySearch1'] = None    #mandatory
+                field_val['rrc.priority'] = 0    #mandatory
+                field_val['rrc.threshServingLow'] = 0    #mandatory
+                field_val['rrc.s_PrioritySearch1'] = 0    #mandatory
                 field_val['rrc.s_PrioritySearch2'] = 0    #optional
 
                 for val in field.iter('field'):
@@ -1348,9 +1349,19 @@ class MobilityMisconfigAnalyzer(Analyzer):
         self.__add_plmn_search_cell(s, log_item)
         if (CellID,DLFreq) not in self.__lte_mobility_misconfig_serving_cell_dict.keys():
             self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)] = {}
+        if "lte_geolocation" not in self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)]:
+            radio = "LTE"
+            mcc = "%(MCC)d" % log_item
+            net = "%(MNC)d" % log_item
+            area = "%(TAC)d" % log_item
+            cell = "%(Cell Identity)d" % log_item
+            output = subprocess.check_output(['python', '/home/deng164/milab-server/manage.py', 'query', radio, mcc, net, area, cell])
+            self.__last_geolocation = ast.literal_eval(output)
+            self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)]["lte_geolocation"] = self.__last_geolocation
         if "lte_rrc_cerv_cell_info" not in self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)]:
             self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)]["lte_rrc_cerv_cell_info"] = []
         log_item['timestamp'] = str(log_item['timestamp'])
+        log_item.update(self.__last_geolocation)
         self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)]["lte_rrc_cerv_cell_info"].append(log_item)
         self.__last_CellID = CellID
         self.__last_DLFreq = DLFreq
