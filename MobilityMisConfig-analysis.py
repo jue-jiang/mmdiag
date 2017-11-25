@@ -13,23 +13,30 @@ from mobilitymisconfig_analyzer import MobilityMisconfigAnalyzer
 
 
 def get_sorted_logs(directory):
-    logs = None
-    for root, d, filenames in os.walk(directory):
-        logs = [f for f in filenames if f.endswith(".mi2log")]
-        break
-    # sorted_logs = []
-    # for f in logs:
-    #     # print f
-    #     # location, rat, d, t, imsi, phone, carrier = re.match(r"(.+)_(.+)_diag_log_(\d+)_(\d+)_(\d+|null)_(samsung-SM-G900T|Huawei-Nexus6P|Google-Pixel)_(T-Mobile|null|AT&T-MicroCell|AT&T|VerizonWireless|Sprint)\.mi2log", f).groups()
-    #     d, t, imsi, phone, carrier = re.match(r"diag_log_(\d+)_(\d+)_(\d+|null)_(samsung-SM-G900T|Huawei-Nexus6P|Google-Pixel|Google-PixelXL)_(T-Mobile|null|AT&T-MicroCell|AT&T|VerizonWireless|Sprint|Project_Fi-310260|-)\.mi2log", f).groups()
-    #     if len(t) < 6:
-    #         t += '0'
-    #     key = d + t
-    #     sorted_logs.append((key, f))
-    # # sorted by date + time
-    # sorted_logs = [f for k, f in sorted(sorted_logs)]
-    # return sorted_logs
-    return logs
+    # logs = []
+    # for root, d, filenames in os.walk(directory):
+    #     for f in filenames:
+    #         if (f.endswith(".mi2log") or f.endswith(".qmdl")):
+    #             logs.append(os.path.join(root, f))
+    # # sorted_logs = []
+    # # for f in logs:
+    # #     # print f
+    # #     # location, rat, d, t, imsi, phone, carrier = re.match(r"(.+)_(.+)_diag_log_(\d+)_(\d+)_(\d+|null)_(samsung-SM-G900T|Huawei-Nexus6P|Google-Pixel)_(T-Mobile|null|AT&T-MicroCell|AT&T|VerizonWireless|Sprint)\.mi2log", f).groups()
+    # #     d, t, imsi, phone, carrier = re.match(r"diag_log_(\d+)_(\d+)_(\d+|null)_(samsung-SM-G900T|Huawei-Nexus6P|Google-Pixel|Google-PixelXL)_(T-Mobile|null|AT&T-MicroCell|AT&T|VerizonWireless|Sprint|Project_Fi-310260|-)\.mi2log", f).groups()
+    # #     if len(t) < 6:
+    # #         t += '0'
+    # #     key = d + t
+    # #     sorted_logs.append((key, f))
+    # # # sorted by date + time
+    # # sorted_logs = [f for k, f in sorted(sorted_logs)]
+    # # return sorted_logs
+    # return logs
+
+    content = []
+    with open(directory) as f:
+        content = f.readlines()
+    content = [x.strip() for x in content]
+    return content
 
 
 def parse_qmdl(path_input):
@@ -46,7 +53,7 @@ def parse_qmdl(path_input):
         # print "=== %s ===" % f
         m.reset()
         m.set_source(src)
-        src.set_input_path(directory + f)
+        src.set_input_path(f)
 
         # Start the monitoring
         src.run()
@@ -152,17 +159,17 @@ def parse_qmdl(path_input):
         for CellIdentityCombine, CellInfo in utra_mobility_misconfig_serving_cell_dict.iteritems():
             print CellIdentityCombine
             for InfoKey, InfoValue in CellInfo.iteritems():
+                if InfoKey == "umts_geolocation":
+                    continue
                 print InfoKey
                 if isinstance(InfoValue, list):
                     for InfoValueItem in InfoValue:
                         print InfoValueItem
                 elif isinstance(InfoValue, dict):
-                    print "\n\n\n\nHaotian\n\n\n\n"
                     for InfoValueKey, InfoValueItem in InfoValue:
                         print InfoValueKey
                         print InfoValueItem
             print "-----------------------------------------------------------"
-
 
     # fd = open("mmAnalyzer-result.pickle", "wb")
     # pickle.dump(m.get_umts_normal_service_log(), fd)

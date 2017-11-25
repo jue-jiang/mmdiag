@@ -289,7 +289,7 @@ if __name__ == "__main__":
 
 
     # print dict3gCell
-    # print dictCell
+    print dictCell
     outFile = open('outdata.txt','w+')
     outFile.write(str(dictCell))
 

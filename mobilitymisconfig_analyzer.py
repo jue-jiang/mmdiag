@@ -85,6 +85,14 @@ class MobilityMisconfigAnalyzer(Analyzer):
         self.__lte_mobility_misconfig_serving_cell_dict = {}
         self.__3g_mobility_misconfig_serving_cell_dict = {}
 
+    def reset(self):
+        self.__lte_mobility_misconfig_serving_cell_dict = {}
+        self.__3g_mobility_misconfig_serving_cell_dict = {}
+        self.__last_CellID = None
+        self.__last_DLFreq = None
+        self.__last_3g_cellId = None
+        self.__last_3g_UtraDLFreq = None
+
 
     def set_source(self,source):
         """
@@ -95,24 +103,24 @@ class MobilityMisconfigAnalyzer(Analyzer):
         """
         Analyzer.set_source(self,source)
 
-        source.enable_log("CDMA_Paging_Channel_Message")
+        # source.enable_log("CDMA_Paging_Channel_Message")
 
-        # source.enable_log("1xEV_Signaling_Control_Channel_Broadcast")
+        # # source.enable_log("1xEV_Signaling_Control_Channel_Broadcast")
 
-        source.enable_log("UMTS_NAS_GMM_State")
-        source.enable_log("UMTS_NAS_MM_State")
-        source.enable_log("UMTS_NAS_OTA_Packet")
+        # source.enable_log("UMTS_NAS_GMM_State")
+        # source.enable_log("UMTS_NAS_MM_State")
+        # source.enable_log("UMTS_NAS_OTA_Packet")
         source.enable_log("WCDMA_RRC_Serv_Cell_Info")
         source.enable_log("WCDMA_RRC_OTA_Packet")
 
         source.enable_log("LTE_RRC_OTA_Packet")
         # source.enable_log("LTE_RRC_MIB_Message_Log_Packet")
         source.enable_log("LTE_RRC_Serv_Cell_Info")
-        source.enable_log("LTE_NAS_EMM_State")
-        source.enable_log("LTE_NAS_ESM_OTA_Incoming_Packet")
-        source.enable_log("LTE_NAS_ESM_OTA_Outgoing_Packet")
-        source.enable_log("LTE_NAS_EMM_OTA_Incoming_Packet")
-        source.enable_log("LTE_NAS_EMM_OTA_Outgoing_Packet")
+        # source.enable_log("LTE_NAS_EMM_State")
+        # source.enable_log("LTE_NAS_ESM_OTA_Incoming_Packet")
+        # source.enable_log("LTE_NAS_ESM_OTA_Outgoing_Packet")
+        # source.enable_log("LTE_NAS_EMM_OTA_Incoming_Packet")
+        # source.enable_log("LTE_NAS_EMM_OTA_Outgoing_Packet")
 
 
     def get_umts_normal_service_log(self):
@@ -193,44 +201,47 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
 
     def __filter(self, event):
-        log_item = event.data.decode()
-        decoded_event = Event(event.timestamp, event.type_id, log_item)
+        try:
+            log_item = event.data.decode()
+            decoded_event = Event(event.timestamp, event.type_id, log_item)
 
-        # Deal with out-of-order timestamps
-        this_ts = log_item["timestamp"]
-        if isinstance(this_ts, basestring):
-            print log_item
-        if this_ts.year != 1980:    # Ignore undefined timestamp
-            if self.__last_valid_timestamp:
-                sec = (this_ts - self.__last_valid_timestamp).total_seconds()
-                if sec >= 1200 or sec <= -120:
-                    self.__pause(self.__last_valid_timestamp)
-            self.__last_valid_timestamp = this_ts
+            # Deal with out-of-order timestamps
+            this_ts = log_item["timestamp"]
+            if isinstance(this_ts, basestring):
+                print log_item
+            if this_ts.year != 1980:    # Ignore undefined timestamp
+                if self.__last_valid_timestamp:
+                    sec = (this_ts - self.__last_valid_timestamp).total_seconds()
+                    if sec >= 1200 or sec <= -120:
+                        self.__pause(self.__last_valid_timestamp)
+                self.__last_valid_timestamp = this_ts
 
-        if event.type_id == "CDMA_Paging_Channel_Message":
-            self.__callback_cdma_paging_chann(decoded_event)
-        elif event.type_id == "1xEV_Signaling_Control_Channel_Broadcast":
-            self.__callback_1xev_broadcast_chann(decoded_event)
-        elif event.type_id == "UMTS_NAS_MM_State":
-            # Ignore
+            if event.type_id == "CDMA_Paging_Channel_Message":
+                self.__callback_cdma_paging_chann(decoded_event)
+            elif event.type_id == "1xEV_Signaling_Control_Channel_Broadcast":
+                self.__callback_1xev_broadcast_chann(decoded_event)
+            elif event.type_id == "UMTS_NAS_MM_State":
+                # Ignore
+                pass
+            elif event.type_id == "UMTS_NAS_GMM_State":
+                self.__callback_umts_nas_gmm(decoded_event)
+            elif event.type_id == "UMTS_NAS_OTA_Packet":
+                self.__callback_umts_nas(decoded_event)
+            elif event.type_id == "WCDMA_RRC_Serv_Cell_Info":
+                self.__callback_wcdma_cell_id(decoded_event)
+            elif event.type_id == "WCDMA_RRC_OTA_Packet":
+                if "Msg" in log_item:
+                    self.__callback_wcdma_rrc_ota(decoded_event)
+            elif event.type_id == "LTE_NAS_EMM_State":
+                self.__callback_lte_nas_emm(decoded_event)
+            elif event.type_id.startswith("LTE_NAS_ESM_Plain_OTA_") or event.type_id.startswith("LTE_NAS_EMM_Plain_OTA_"):
+                self.__callback_lte_nas(decoded_event)
+            elif event.type_id == "LTE_RRC_OTA_Packet":
+                self.__callback_lte_rrc_ota(decoded_event)
+            elif event.type_id == "LTE_RRC_Serv_Cell_Info":
+                self.__callback_lte_rrc_serv_cell_info(decoded_event)
+        except Exception as e:
             pass
-        elif event.type_id == "UMTS_NAS_GMM_State":
-            self.__callback_umts_nas_gmm(decoded_event)
-        elif event.type_id == "UMTS_NAS_OTA_Packet":
-            self.__callback_umts_nas(decoded_event)
-        elif event.type_id == "WCDMA_RRC_Serv_Cell_Info":
-            self.__callback_wcdma_cell_id(decoded_event)
-        elif event.type_id == "WCDMA_RRC_OTA_Packet":
-            if "Msg" in log_item:
-                self.__callback_wcdma_rrc_ota(decoded_event)
-        elif event.type_id == "LTE_NAS_EMM_State":
-            self.__callback_lte_nas_emm(decoded_event)
-        elif event.type_id.startswith("LTE_NAS_ESM_Plain_OTA_") or event.type_id.startswith("LTE_NAS_EMM_Plain_OTA_"):
-            self.__callback_lte_nas(decoded_event)
-        elif event.type_id == "LTE_RRC_OTA_Packet":
-            self.__callback_lte_rrc_ota(decoded_event)
-        elif event.type_id == "LTE_RRC_Serv_Cell_Info":
-            self.__callback_lte_rrc_serv_cell_info(decoded_event)
 
 
     def __pause(self, last_valid_timestamp):
@@ -427,7 +438,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     if val.get('name') == 'rrc.RAT_FDD_Info_element':
                         rat_info = {}
                         for item in val.iter('field'):
-                            if item.get('name') == 'rrc.rat_Identifier':
+                            if item.get('name') == 'rrc.rat_Identifier' and item.get('showname') is not None:
                                 rat_info[item.get('name')] = item.get('showname').split(': ')[1]
                             elif item.get("name") == "rrc.s_SearchRAT" or item.get("name") == "rrc.s_Limit_SearchRAT":
                                 rat_info[item.get('name')] = int(item.get('show'))
@@ -500,6 +511,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 for val in field.iter('field'):
                     if val.get('name') == field.get('name'):
                         continue
+                    if val.get('name') is None or val.get('showname') is None:
+                        continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
                     else:
@@ -516,6 +529,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
                 for val in field.iter('field'):
                     if val.get('name') == field.get('name'):
+                        continue
+                    if val.get('name') is None or val.get('showname') is None:
                         continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
@@ -534,6 +549,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 for val in field.iter('field'):
                     if val.get('name') == field.get('name'):
                         continue
+                    if val.get('name') is None or val.get('showname') is None:
+                        continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
                     else:
@@ -551,6 +568,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 for val in field.iter('field'):
                     if val.get('name') == "rrc.event" and "e1d" in val.get('showname'):
                         findE1D = True
+                    if val.get('name') is None or val.get('showname') is None:
+                        continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
                     else:
@@ -569,6 +588,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 for val in field.iter('field'):
                     if val.get('name') == field.get('name'):
                         continue
+                    if val.get('name') is None or val.get('showname') is None:
+                        continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
                     else:
@@ -585,6 +606,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
                 for val in field.iter('field'):
                     if val.get('name') == field.get('name'):
+                        continue
+                    if val.get('name') is None or val.get('showname') is None:
                         continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
@@ -603,6 +626,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 for val in field.iter('field'):
                     if val.get('name') == field.get('name'):
                         continue
+                    if val.get('name') is None or val.get('showname') is None:
+                        continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
                     else:
@@ -619,6 +644,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
                 for val in field.iter('field'):
                     if val.get('name') == field.get('name'):
+                        continue
+                    if val.get('name') is None or val.get('showname') is None:
                         continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
@@ -637,7 +664,11 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 field_val = {}
 
                 for val in field.iter('field'):
+                    if val.get('name') is None or val.get('showname') is None:
+                        continue
                     if val.get('name') == field.get('name'):
+                        continue
+                    if val.get('name') is None or val.get('showname') is None:
                         continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
@@ -658,6 +689,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 for val in field.iter('field'):
                     if val.get('name') == field.get('name'):
                         continue
+                    if val.get('name') is None or val.get('showname') is None:
+                        continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
                         # print val.get('name') + "|" + (val.get('showname')).split(' ')[1]
@@ -676,6 +709,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
                 for val in field.iter('field'):
                     if val.get('name') == field.get('name'):
+                        continue
+                    if val.get('name') is None or val.get('showname') is None:
                         continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
@@ -696,6 +731,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 for val in field.iter('field'):
                     if val.get('name') == field.get('name'):
                         continue
+                    if val.get('name') is None or val.get('showname') is None:
+                        continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
                         # print val.get('name') + "|" + (val.get('showname')).split(' ')[1]
@@ -715,6 +752,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 for val in field.iter('field'):
                     if val.get('name') == field.get('name'):
                         continue
+                    if val.get('name') is None or val.get('showname') is None:
+                        continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
                         # print val.get('name') + "|" + (val.get('showname')).split(' ')[1]
@@ -733,6 +772,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
                 for val in field.iter('field'):
                     if val.get('name') == field.get('name'):
+                        continue
+                    if val.get('name') is None or val.get('showname') is None:
                         continue
                     if len((val.get('showname')).split(' ')) == 3 and (val.get('showname')).split(' ')[2][0] == '(':
                         field_val[val.get('name')] = (val.get('showname')).split(' ')[1]
