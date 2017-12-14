@@ -84,9 +84,11 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
         self.__lte_mobility_misconfig_serving_cell_dict = {}
         self.__3g_mobility_misconfig_serving_cell_dict = {}
+        self.__last_lte_distinguisher = 0
 
     def reset(self):
         self.__lte_mobility_misconfig_serving_cell_dict = {}
+        self.__last_lte_distinguisher = 0
         self.__3g_mobility_misconfig_serving_cell_dict = {}
         self.__last_CellID = None
         self.__last_DLFreq = None
@@ -1115,11 +1117,14 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
         CellID = log_item["Physical Cell ID"]
         DLFreq = log_item["Freq"]
-        if (CellID,DLFreq) not in self.__lte_mobility_misconfig_serving_cell_dict.keys():
-            self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)] = {}
 
-        self.__last_CellID = CellID
-        self.__last_DLFreq = DLFreq
+        if self.__last_CellID is None or self.__last_CellID != CellID or self.__last_DLFreq is None or self.__last_DLFreq != DLFreq:
+            self.__last_lte_distinguisher += 1
+            self.__last_CellID = CellID
+            self.__last_DLFreq = DLFreq
+
+        if (CellID,DLFreq,self.__last_lte_distinguisher) not in self.__lte_mobility_misconfig_serving_cell_dict.keys():
+            self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq, self.__last_lte_distinguisher)] = {}
 
         cell_info = {"plmn": None, "tac": None, "cell_id": None}
         if log_item["PDU Number"] == 2 or log_item["PDU Number"] == 9: # BCCH_DL_SCH, orignal 2
@@ -1149,11 +1154,11 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     cell_info["cell_id"] = int(val.get("value"), base=16) / 16
 
             if cell_info['cell_id'] != None:
-                if "plmn_Identity_element" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)].keys():
-                    if cell_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["plmn_Identity_element"]:
-                        self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["plmn_Identity_element"].append(cell_info)
+                if "plmn_Identity_element" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)].keys():
+                    if cell_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["plmn_Identity_element"]:
+                        self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["plmn_Identity_element"].append(cell_info)
                 else:
-                    self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["plmn_Identity_element"] = [cell_info]
+                    self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["plmn_Identity_element"] = [cell_info]
 
         elif log_item["PDU Number"] == 6 or log_item["PDU Number"] == 13: # LTE-RRC_DL_DCCH
             for val in log_xml.iter("field"):
@@ -1178,10 +1183,10 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     except AttributeError:
                         pass
                     else:
-                        if "lte_rrc_measurement_report" not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID, self.__last_DLFreq)]:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["lte_rrc_measurement_report"] = []
-                        if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["lte_rrc_measurement_report"]:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["lte_rrc_measurement_report"].append(info)
+                        if "lte_rrc_measurement_report" not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID, self.__last_DLFreq,self.__last_lte_distinguisher)]:
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_rrc_measurement_report"] = []
+                        if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_rrc_measurement_report"]:
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_rrc_measurement_report"].append(info)
                     break
 
         if is_sib1 or is_sib3 or is_sib4 or is_sib5 or is_sib6 or is_sib8 or is_rrc_conn_reconfig:
@@ -1219,11 +1224,11 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     except AttributeError:
                         pass
                     else:
-                        if "[sib3]cellReselectionInfoCommon_element" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)].keys():
-                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib3]cellReselectionInfoCommon_element"]:
-                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib3]cellReselectionInfoCommon_element"].append(info)
+                        if "[sib3]cellReselectionInfoCommon_element" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)].keys():
+                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib3]cellReselectionInfoCommon_element"]:
+                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib3]cellReselectionInfoCommon_element"].append(info)
                         else:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib3]cellReselectionInfoCommon_element"] = [info]
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib3]cellReselectionInfoCommon_element"] = [info]
                 if val.get("name") == "lte-rrc.cellReselectionServingFreqInfo_element":
                     info = dict()
                     for attr in val.iter("field"):
@@ -1237,11 +1242,11 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     except AttributeError:
                         pass
                     else:
-                        if "[sib3]cellReselectionServingFreqInfo_element" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)].keys():
-                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib3]cellReselectionServingFreqInfo_element"]:
-                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib3]cellReselectionServingFreqInfo_element"].append(info)
+                        if "[sib3]cellReselectionServingFreqInfo_element" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)].keys():
+                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib3]cellReselectionServingFreqInfo_element"]:
+                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib3]cellReselectionServingFreqInfo_element"].append(info)
                         else:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib3]cellReselectionServingFreqInfo_element"] = [info]
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib3]cellReselectionServingFreqInfo_element"] = [info]
                 if val.get("name") == "lte-rrc.intraFreqCellReselectionInfo_element":
                     info = dict()
                     for attr in val.iter("field"):
@@ -1255,11 +1260,11 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     except AttributeError:
                         pass
                     else:
-                        if "[sib3]intraFreqCellReselectionInfo_element" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)].keys():
-                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib3]intraFreqCellReselectionInfo_element"]:
-                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib3]intraFreqCellReselectionInfo_element"].append(info)
+                        if "[sib3]intraFreqCellReselectionInfo_element" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)].keys():
+                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib3]intraFreqCellReselectionInfo_element"]:
+                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib3]intraFreqCellReselectionInfo_element"].append(info)
                         else:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib3]intraFreqCellReselectionInfo_element"] = [info]
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib3]intraFreqCellReselectionInfo_element"] = [info]
 
         if is_sib4:
             for val in log_xml.iter("field"):
@@ -1275,11 +1280,11 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     except AttributeError:
                         pass
                     else:
-                        if "[sib4]intraFreqBlackCellList" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)].keys():
-                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib4]intraFreqBlackCellList"]:
-                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib4]intraFreqBlackCellList"].append(info)
+                        if "[sib4]intraFreqBlackCellList" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)].keys():
+                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib4]intraFreqBlackCellList"]:
+                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib4]intraFreqBlackCellList"].append(info)
                         else:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib4]intraFreqBlackCellList"] = [info]
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib4]intraFreqBlackCellList"] = [info]
 
         if is_sib5:
             for val in log_xml.iter("field"):
@@ -1297,11 +1302,11 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     except AttributeError:
                         pass
                     else:
-                        if "[sib5]InterFreqCarrierFreqInfo_element" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)].keys():
-                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib5]InterFreqCarrierFreqInfo_element"]:
-                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib5]InterFreqCarrierFreqInfo_element"].append(info)
+                        if "[sib5]InterFreqCarrierFreqInfo_element" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)].keys():
+                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]InterFreqCarrierFreqInfo_element"]:
+                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]InterFreqCarrierFreqInfo_element"].append(info)
                         else:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib5]InterFreqCarrierFreqInfo_element"] = [info]
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]InterFreqCarrierFreqInfo_element"] = [info]
                 if val.get("name") == "lte-rrc.PhysCellIdRange_element":
                     info = dict()
                     # Iter over all attrs
@@ -1314,11 +1319,11 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     except AttributeError:
                         pass
                     else:
-                        if "[sib5]interFreqBlackCellList" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)].keys():
-                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib5]interFreqBlackCellList"]:
-                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib5]interFreqBlackCellList"].append(info)
+                        if "[sib5]interFreqBlackCellList" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)].keys():
+                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]interFreqBlackCellList"]:
+                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]interFreqBlackCellList"].append(info)
                         else:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib5]interFreqBlackCellList"] = [info]
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]interFreqBlackCellList"] = [info]
 
         if is_sib6:
             # Iter over all CarrierFreqUTRA_FDD elements
@@ -1338,11 +1343,11 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     except AttributeError:
                         pass
                     else:
-                        if "[sib6]CarrierFreqUTRA_FDD_element" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)].keys():
-                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib6]CarrierFreqUTRA_FDD_element"]:
-                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib6]CarrierFreqUTRA_FDD_element"].append(info)
+                        if "[sib6]CarrierFreqUTRA_FDD_element" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)].keys():
+                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib6]CarrierFreqUTRA_FDD_element"]:
+                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib6]CarrierFreqUTRA_FDD_element"].append(info)
                         else:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib6]CarrierFreqUTRA_FDD_element"] = [info]
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib6]CarrierFreqUTRA_FDD_element"] = [info]
                     self.__lte_cell_resel_to_umts_config.append(info)
 
         if is_sib8:
@@ -1362,11 +1367,11 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     except AttributeError:
                         pass
                     else:
-                        if "[sib8]" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)].keys():
-                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib8]"]:
-                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib8]"].append(info)
+                        if "[sib8]" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)].keys():
+                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib8]"]:
+                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib8]"].append(info)
                         else:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["[sib8]"] = [info]
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib8]"] = [info]
                     self.__lte_cell_resel_to_umts_config.append(info)
 
         if is_rrc_conn_reconfig:
@@ -1432,10 +1437,10 @@ class MobilityMisconfigAnalyzer(Analyzer):
                                     cell_id = int(cell_val['lte-rrc.physCellId'])
                                     cell_offset = q_offset_range[int(cell_val['lte-rrc.cellIndividualOffset'])]
                                     new_info["cell_list"].append({"cell_id":cell_id,"cell_offset":cell_offset})
-                        if "lte_measurement_object" not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID, self.__last_DLFreq)]:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["lte_measurement_object"] = []
-                        if new_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["lte_measurement_object"]:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["lte_measurement_object"].append(new_info)
+                        if "lte_measurement_object" not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID, self.__last_DLFreq,self.__last_lte_distinguisher)]:
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_measurement_object"] = []
+                        if new_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_measurement_object"]:
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_measurement_object"].append(new_info)
 
                     #Add a UTRA (3G) measurement object:
                     if field.get('name') == "lte-rrc.measObjectUTRA_element":
@@ -1451,10 +1456,10 @@ class MobilityMisconfigAnalyzer(Analyzer):
                         offsetFreq = int(field_val['lte-rrc.offsetFreq'])
                         new_info = {"measobj_id":measobj_id,"freq":freq,"offsetFreq":offsetFreq}
 
-                        if "utra_3g_measurement_object" not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID, self.__last_DLFreq)]:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["utra_3g_measurement_object"] = []
-                        if new_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["utra_3g_measurement_object"]:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["utra_3g_measurement_object"].append(new_info)
+                        if "utra_3g_measurement_object" not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID, self.__last_DLFreq,self.__last_lte_distinguisher)]:
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["utra_3g_measurement_object"] = []
+                        if new_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["utra_3g_measurement_object"]:
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["utra_3g_measurement_object"].append(new_info)
 
                     #Add a LTE report configuration
                     if field.get('name') == "lte-rrc.reportConfigEUTRA_element":
@@ -1550,10 +1555,10 @@ class MobilityMisconfigAnalyzer(Analyzer):
                                                 break
                                 new_info["event_list"].append({"event_type":"b2","threshold1":threshold1,"threshold2":threshold2})
 
-                        if "lte_report_configuration" not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["lte_report_configuration"] = []
-                        if new_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["lte_report_configuration"]:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["lte_report_configuration"].append(new_info)
+                        if "lte_report_configuration" not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]:
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_report_configuration"] = []
+                        if new_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_report_configuration"]:
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_report_configuration"].append(new_info)
 
 
                     #Add a 2G/3G report configuration
@@ -1609,10 +1614,10 @@ class MobilityMisconfigAnalyzer(Analyzer):
                                                 break
                                 new_info["event_list"].append({"event_type":"b2","threshold1":threshold1,"threshold2":threshold2})
 
-                        if "2g3g_report_reconfiguration" not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["2g3g_report_reconfiguration"] = []
-                        if new_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["2g3g_report_reconfiguration"]:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["2g3g_report_reconfiguration"].append(new_info)
+                        if "2g3g_report_reconfiguration" not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]:
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["2g3g_report_reconfiguration"] = []
+                        if new_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["2g3g_report_reconfiguration"]:
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["2g3g_report_reconfiguration"].append(new_info)
 
                     #Add a LTE measurement report config
                     if field.get('name') == "lte-rrc.MeasIdToAddMod_element":
@@ -1626,10 +1631,10 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
                         new_info = {"measId":meas_id,"measObjectId":obj_id,"reportConfigId":config_id}
 
-                        if "lte_measurement_report_config" not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID, self.__last_DLFreq)]:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["lte_measurement_report_config"] = []
-                        if new_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["lte_measurement_report_config"]:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq)]["lte_measurement_report_config"].append(new_info)
+                        if "lte_measurement_report_config" not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID, self.__last_DLFreq,self.__last_lte_distinguisher)]:
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_measurement_report_config"] = []
+                        if new_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_measurement_report_config"]:
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_measurement_report_config"].append(new_info)
 
         self.__last_lte_rrc_freq = log_item["Freq"]
 
@@ -1647,10 +1652,16 @@ class MobilityMisconfigAnalyzer(Analyzer):
 
         CellID = int("%(Cell ID)d" % log_item)
         DLFreq = int("%(Downlink frequency)d" % log_item)
+
+        if self.__last_CellID is None or self.__last_CellID != CellID or self.__last_DLFreq is None or self.__last_DLFreq != DLFreq:
+            self.__last_lte_distinguisher += 1
+            self.__last_CellID = CellID
+            self.__last_DLFreq = DLFreq
+
         self.__add_plmn_search_cell(s, log_item)
-        if (CellID,DLFreq) not in self.__lte_mobility_misconfig_serving_cell_dict.keys():
-            self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)] = {}
-        if "lte_geolocation" not in self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)]:
+        if (CellID,DLFreq,self.__last_lte_distinguisher) not in self.__lte_mobility_misconfig_serving_cell_dict.keys():
+            self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq,self.__last_lte_distinguisher)] = {}
+        if "lte_geolocation" not in self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq,self.__last_lte_distinguisher)]:
             radio = "LTE"
             mcc = "%(MCC)d" % log_item
             net = "%(MNC)d" % log_item
@@ -1658,11 +1669,9 @@ class MobilityMisconfigAnalyzer(Analyzer):
             cell = "%(Cell Identity)d" % log_item
             output = subprocess.check_output(['python', '/home/deng164/milab-server/manage.py', 'query', radio, mcc, net, area, cell])
             self.__last_geolocation = ast.literal_eval(output)
-            self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)]["lte_geolocation"] = self.__last_geolocation
-        if "lte_rrc_cerv_cell_info" not in self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)]:
-            self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)]["lte_rrc_cerv_cell_info"] = []
+            self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq,self.__last_lte_distinguisher)]["lte_geolocation"] = self.__last_geolocation
+        if "lte_rrc_cerv_cell_info" not in self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq,self.__last_lte_distinguisher)]:
+            self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq,self.__last_lte_distinguisher)]["lte_rrc_cerv_cell_info"] = []
         log_item['timestamp'] = str(log_item['timestamp'])
         log_item.update(self.__last_geolocation)
-        self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq)]["lte_rrc_cerv_cell_info"].append(log_item)
-        self.__last_CellID = CellID
-        self.__last_DLFreq = DLFreq
+        self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq,self.__last_lte_distinguisher)]["lte_rrc_cerv_cell_info"].append(log_item)
