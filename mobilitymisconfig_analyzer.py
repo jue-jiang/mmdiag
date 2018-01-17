@@ -1464,11 +1464,20 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     #Add a LTE report configuration
                     if field.get('name') == "lte-rrc.reportConfigEUTRA_element":
                         hyst = 0
+                        timeToTrigger = "Not Present"
+                        reportInterval = "Not Present"
+                        reportAmount = "Not Present"
                         for val in field.iter('field'):
                             if val.get('name') == 'lte-rrc.hysteresis':
                                 hyst = int(val.get('show'))
+                            if val.get('name') == 'lte-rrc.timeToTrigger':
+                                timeToTrigger = val.get('showname').split(':')[1].split('(')[0].replace(" ", "")
+                            if val.get('name') == 'lte-rrc.reportInterval':
+                                reportInterval = val.get('showname').split(':')[1].split('(')[0].replace(" ", "")
+                            if val.get('name') == 'lte-rrc.reportAmount':
+                                reportAmount = val.get('showname').split(':')[1].split('(')[0].replace(" ", "")
 
-                        new_info = {"report_id":report_id,"hyst":hyst/2.0}
+                        new_info = {"report_id":report_id, "hyst":hyst/2.0, "timeToTrigger":timeToTrigger, "reportInterval":reportInterval, "reportAmount":reportAmount}
                         new_info["event_list"] = []
 
                         for val in field.iter('field'):
