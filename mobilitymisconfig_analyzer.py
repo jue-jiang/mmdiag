@@ -1112,6 +1112,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
         is_sib4 = False
         is_sib5 = False
         is_sib6 = False
+        is_sib7 = False
         is_sib8 = False
         is_rrc_conn_reconfig = False
 
@@ -1139,6 +1140,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     is_sib5 = True
                 elif val.get("name") == "lte-rrc.sib6_element":
                     is_sib6 = True
+                elif val.get("name") == "lte-rrc.sib7_element":
+                    is_sib7 = True
                 elif val.get("name") == "lte-rrc.sib8_element":
                     is_sib8 = True
 
@@ -1189,26 +1192,32 @@ class MobilityMisconfigAnalyzer(Analyzer):
                             self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_rrc_measurement_report"].append(info)
                     break
 
-        if is_sib1 or is_sib3 or is_sib4 or is_sib5 or is_sib6 or is_sib8 or is_rrc_conn_reconfig:
+        if is_sib1 or is_sib3 or is_sib4 or is_sib5 or is_sib6 or is_sib7 or is_sib8 or is_rrc_conn_reconfig:
             Pattern1 = re.compile(r": (.*) \([-\d]+\)$")
             Pattern2 = re.compile(r": (.*)$")
 
         if is_sib1:
-            s = "LTE/%(plmn)s-%(tac)d-%(cell_id)d" % cell_info
-            self.__add_plmn_search_cell(s, log_item)
-            info = {"subframeAssignment": None,
-                    "specialSubframePatterns": None,
-                    "si_WindowLength": None,
-                    "systemInfoValueTag": None
-                    }
-            for attr in log_xml.iter("field"):
-                ss = attr.get("showname")
-                if attr.get("name") in ("lte-rrc.subframeAssignment", "lte-rrc.specialSubframePatterns", "lte-rrc.si_WindowLength"):
-                    info[attr.get("name")[8:]] = re.findall(Pattern1, ss)[0]
-                elif attr.get("name") == "lte-rrc.systemInfoValueTag":
-                    info[attr.get("name")[8:]] = re.findall(Pattern2, ss)[0]
-            info["lte_rrc_freq"] = log_item["Freq"]
-            self.__lte_tdd_config.append(info)
+            info = {"q_RxLevMin": "Unknown", "q_RxLevMinOffset": "Unknown", "p_Max": "Unknown"}
+            for val in log_xml.iter("field"):
+                if val.get("name") == "lte-rrc.cellSelectionInfo_element":
+                    for attr in val.iter("field"):
+                        s = attr.get("showname")
+                        if attr.get("name") in ("lte-rrc.q_RxLevMin", "lte-rrc.q_RxLevMinOffset"):
+                            info[attr.get("name")[8:]] = re.findall(Pattern1, s)[0]
+                if val.get("name") == "lte-rrc.p_Max":
+                    attr = val
+                    s = attr.get("showname")
+                    info[attr.get("name")[8:]] = re.findall(Pattern2, s)[0]
+            try:
+                self.__last_CellID
+            except AttributeError:
+                pass
+            else:
+                if "[sib1]" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)].keys():
+                    if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib1]"]:
+                        self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib1]"].append(info)
+                else:
+                    self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib1]"] = [info]
 
         if is_sib3:
             # Iter over all cellReselectionInfoCommon_element
@@ -1349,7 +1358,33 @@ class MobilityMisconfigAnalyzer(Analyzer):
                         else:
                             self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib6]CarrierFreqUTRA_FDD_element"] = [info]
                     self.__lte_cell_resel_to_umts_config.append(info)
+        if is_sib7:
+            info = {}
+            for val in log_xml.iter("field"):
+                if val.get("name") == "lte-rrc.t_ReselectionGERAN":
+                    attr = val
+                    s = attr.get("showname")
+                    info[attr.get("name")[8:]] = re.findall(Pattern2, s)[0]
 
+                if val.get("name") == "lte-rrc.CarrierFreqsInfoGERAN_element":
+                    # Iter over all attrs
+                    for attr in val.iter("field"):
+                        s = attr.get("showname")
+                        if attr.get("name") in ("lte-rrc.bandIndicator", "lte-rrc.q_RxLevMin", "lte-rrc.threshX_High", "lte-rrc.threshX_Low"):
+                            info[attr.get("name")[8:]] = re.findall(Pattern1, s)[0]
+                        elif attr.get("name") in ("lte-rrc.cellReselectionPriority", "lte-rrc.p_MaxGERAN"):
+                            info[attr.get("name")[8:]] = re.findall(Pattern2, s)[0]
+                    try:
+                        self.__last_CellID
+                    except AttributeError:
+                        pass
+                    else:
+                        if "[sib7]" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)].keys():
+                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib7]"]:
+                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib7]"].append(info)
+                        else:
+                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib7]"] = [info]
+                    self.__lte_cell_resel_to_umts_config.append(info)
         if is_sib8:
             # Iter over all CarrierFreqUTRA_FDD elements
             for val in log_xml.iter("field"):

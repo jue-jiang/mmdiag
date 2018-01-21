@@ -83,6 +83,11 @@ def parse_qmdl(path_input):
                 print InfoKey
                 for InfoValueItem in CellInfo[InfoKey]:
                     print InfoValueItem
+            InfoKey = "[sib1]"
+            if InfoKey in CellInfo:
+                print InfoKey
+                for InfoValueItem in CellInfo[InfoKey]:
+                    print InfoValueItem
             InfoKey = "[sib3]cellReselectionInfoCommon_element"
             if InfoKey in CellInfo:
                 print InfoKey
@@ -114,6 +119,11 @@ def parse_qmdl(path_input):
                 for InfoValueItem in CellInfo[InfoKey]:
                     print InfoValueItem
             InfoKey = "[sib6]CarrierFreqUTRA_FDD_element"
+            if InfoKey in CellInfo:
+                print InfoKey
+                for InfoValueItem in CellInfo[InfoKey]:
+                    print InfoValueItem
+            InfoKey = "[sib7]"
             if InfoKey in CellInfo:
                 print InfoKey
                 for InfoValueItem in CellInfo[InfoKey]:
