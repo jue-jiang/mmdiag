@@ -59,9 +59,9 @@ class MobilityMisconfigGsmCdmaAnalyzer(Analyzer):
         Analyzer.set_source(self,source)
 
         source.enable_log("GSM_RR_Cell_Information")
-        # source.enable_log("GSM_RR_Cell_Reselection_Parameters")
+        source.enable_log("GSM_RR_Cell_Reselection_Parameters")
         source.enable_log("GSM_DSDS_RR_Cell_Information")
-        # source.enable_log("GSM_DSDS_RR_Cell_Reselection_Parameters")
+        source.enable_log("GSM_DSDS_RR_Cell_Reselection_Parameters")
         source.enable_log("CDMA_Paging_Channel_Message")
         source.enable_log("1xEV_Signaling_Control_Channel_Broadcast")
 
@@ -167,6 +167,9 @@ class MobilityMisconfigGsmCdmaAnalyzer(Analyzer):
         # print command
         # output = subprocess.check_output(command)
         # print output
+        if "gsm_reselection_parameters" not in self.__gsm_mobility_misconfig_serving_cell_dict[(self.__gsm_last_mcc, self.__gsm_last_mnc, self.__gsm_last_lac, self.__gsm_last_cid, self.__gsm_last_bsicncc, self.__gsm_last_bsicbcc)]:
+            self.__gsm_mobility_misconfig_serving_cell_dict[(self.__gsm_last_mcc, self.__gsm_last_mnc, self.__gsm_last_lac, self.__gsm_last_cid, self.__gsm_last_bsicncc, self.__gsm_last_bsicbcc)]["gsm_reselection_parameters"] = []
+        self.__gsm_mobility_misconfig_serving_cell_dict[(self.__gsm_last_mcc, self.__gsm_last_mnc, self.__gsm_last_lac, self.__gsm_last_cid, self.__gsm_last_bsicncc, self.__gsm_last_bsicbcc)]["gsm_reselection_parameters"].append(log_item)
 
     def __callback_cdma_paging_channel_message(self, event):
         log_item = event.data
@@ -231,39 +234,61 @@ class MobilityMisconfigGsmCdmaAnalyzer(Analyzer):
 
     def __callback_evdo_signaling_control_channel_broadcast(self, event):
         log_item = event.data
-        if log_item['Message ID'] != 1 or log_item['Protocol Type'] != 15:
-            return
-        self.__evdo_last_CountryCode = str(log_item['Country Code'])
-        self.__evdo_last_SubnetID = str(log_item['Subnet ID'])
-        self.__evdo_last_SectorID = str(log_item['Sector ID'])
-        if (self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID) not in self.__evdo_mobility_misconfig_serving_cell_dict.keys():
-            self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)] = {}
-        if "evdo_geolocation" not in self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]:
-            self.__evdo_last_geolocation = {
-                    'lat': str(log_item['Latitude']),
-                    'lon': str(log_item['Longitude']),
-                    'city': "Unknown",
-                    'state': "Unknown",
-                    'country': "Unknown",
-                    }
-            g = geocoder.bing([
-                        self.__evdo_last_geolocation['lat'], self.__evdo_last_geolocation['lon']
-                        ], method='reverse')
-            self.__evdo_last_geolocation['city'] = g.city
-            self.__evdo_last_geolocation['state'] = g.state
-            self.__evdo_last_geolocation['country'] = g.country
-            if self.__evdo_last_geolocation['country'] is None:
-                self.__evdo_last_geolocation['country'] = 'None'
-            if self.__evdo_last_geolocation['state'] is None:
-                self.__evdo_last_geolocation['state'] = 'None'
-            if self.__evdo_last_geolocation['city'] is None:
-                self.__evdo_last_geolocation['city'] = 'None'
+        if log_item['Message ID'] == 1 and log_item['Protocol Type'] == 15:
+            self.__evdo_last_CountryCode = str(log_item['Country Code'])
+            self.__evdo_last_SubnetID = str(log_item['Subnet ID'])
+            self.__evdo_last_SectorID = str(log_item['Sector ID'])
+            if (self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID) not in self.__evdo_mobility_misconfig_serving_cell_dict.keys():
+                self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)] = {}
+            if "evdo_geolocation" not in self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]:
+                self.__evdo_last_geolocation = {
+                        'lat': str(log_item['Latitude']),
+                        'lon': str(log_item['Longitude']),
+                        'city': "Unknown",
+                        'state': "Unknown",
+                        'country': "Unknown",
+                        }
+                g = geocoder.bing([
+                            self.__evdo_last_geolocation['lat'], self.__evdo_last_geolocation['lon']
+                            ], method='reverse')
+                self.__evdo_last_geolocation['city'] = g.city
+                self.__evdo_last_geolocation['state'] = g.state
+                self.__evdo_last_geolocation['country'] = g.country
+                if self.__evdo_last_geolocation['country'] is None:
+                    self.__evdo_last_geolocation['country'] = 'None'
+                if self.__evdo_last_geolocation['state'] is None:
+                    self.__evdo_last_geolocation['state'] = 'None'
+                if self.__evdo_last_geolocation['city'] is None:
+                    self.__evdo_last_geolocation['city'] = 'None'
 
-            self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]["evdo_geolocation"] = self.__evdo_last_geolocation
-        log_item['timestamp'] = "'" + str(log_item['timestamp']) + "'"
-        log_item.update(self.__evdo_last_geolocation)
+                self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]["evdo_geolocation"] = self.__evdo_last_geolocation
+            log_item['timestamp'] = "'" + str(log_item['timestamp']) + "'"
+            log_item.update(self.__evdo_last_geolocation)
 
-        if "evdo_signaling" not in self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]:
-            self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]["evdo_signaling"] = []
-        self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]["evdo_signaling"].append(log_item)
+            if "evdo_sector_parameters" not in self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]:
+                self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]["evdo_sector_parameters"] = []
+            self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]["evdo_sector_parameters"].append(log_item)
+        elif log_item['Message ID'] == 3 and log_item['Protocol Type'] == 15:
+            info = {}
+            if self.__evdo_last_CountryCode == None or self.__evdo_last_SubnetID == None or self.__evdo_last_SectorID == None:
+                pass
+            if (self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID) not in self.__evdo_mobility_misconfig_serving_cell_dict.keys():
+                self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)] = {}
+            info['timestamp'] = "'" + str(log_item['timestamp']) + "'"
+            if int(log_item['Num Other RAT']) > 0:
+                otherRATs = log_item['Other RATs']
+                for rat in otherRATs:
+                    ratType = rat['RAT Type']
+                    servPriority = rat['Serv Priority']
+                    threshServ = rat['ThreshServ']
+                    MaxReselectionTimer = rat['MaxReselectionTimer']
+                    for freq in rat['EUTRAFreqs']:
+                        info.update(freq)
+                        info['ratType'] = ratType
+                        info['servPriority'] = servPriority
+                        info['threshServ'] = threshServ
+                        info['MaxReselectionTimer'] = MaxReselectionTimer
+                        if "evdo_other_rat" not in self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]:
+                            self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]["evdo_other_rat"] = []
+                        self.__evdo_mobility_misconfig_serving_cell_dict[(self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]["evdo_other_rat"].append(info)
 

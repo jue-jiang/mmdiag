@@ -22,7 +22,6 @@ def parse_qmdl(plainTextFile):
     m = MobilityMisconfigGsmCdmaAnalyzer()
 
     for f in get_sorted_logs(plainTextFile):
-        print '=========' + f + '========'
         m.reset()
         m.set_source(src)
         src.set_input_path(f)
@@ -41,6 +40,13 @@ def parse_qmdl(plainTextFile):
                 print InfoKey
                 for InfoValueItem in CellInfo[InfoKey]:
                     print InfoValueItem
+            InfoKey = "gsm_reselection_parameters"
+            if InfoKey in CellInfo:
+                print InfoKey
+                for InfoValueItem in CellInfo[InfoKey]:
+                    print InfoValueItem
+
+            print "-----------------------------------------------------------"
 
         for CellIdentityCombine, CellInfo in cdma_mobility_misconfig_serving_cell_dict.iteritems():
             print CellIdentityCombine
@@ -50,13 +56,22 @@ def parse_qmdl(plainTextFile):
                 for InfoValueItem in CellInfo[InfoKey]:
                     print InfoValueItem
 
+            print "-----------------------------------------------------------"
+
         for CellIdentityCombine, CellInfo in evdo_mobility_misconfig_serving_cell_dict.iteritems():
             print CellIdentityCombine
-            InfoKey = "evdo_signaling"
+            InfoKey = "evdo_sector_parameters"
             if InfoKey in CellInfo:
                 print InfoKey
                 for InfoValueItem in CellInfo[InfoKey]:
                     print InfoValueItem
+            InfoKey = "evdo_other_rat"
+            if InfoKey in CellInfo:
+                print InfoKey
+                for InfoValueItem in CellInfo[InfoKey]:
+                    print InfoValueItem
+
+            print "-----------------------------------------------------------"
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
