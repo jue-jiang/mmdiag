@@ -33,7 +33,16 @@ def parse_qmdl(plainTextFile):
         cdma_mobility_misconfig_serving_cell_dict = m.get_cdma_mobility_misconfig_serving_cell_dict()
         evdo_mobility_misconfig_serving_cell_dict = m.get_evdo_mobility_misconfig_serving_cell_dict()
 
+        filename = str(f)
+        print filename
+        carrier = "Unknown"
+        try:
+            carrier = (filename.split('.mi2log')[0]).split('_')[-1]
+        except:
+            carrier = "Unknown"
+
         for CellIdentityCombine, CellInfo in gsm_mobility_misconfig_serving_cell_dict.iteritems():
+            CellIdentityCombine = (carrier,) + CellIdentityCombine
             print CellIdentityCombine
             InfoKey = "gsm_cell_information"
             if InfoKey in CellInfo:
@@ -49,6 +58,7 @@ def parse_qmdl(plainTextFile):
             print "-----------------------------------------------------------"
 
         for CellIdentityCombine, CellInfo in cdma_mobility_misconfig_serving_cell_dict.iteritems():
+            CellIdentityCombine = (carrier,) + CellIdentityCombine
             print CellIdentityCombine
             InfoKey = "cdma_paging"
             if InfoKey in CellInfo:
@@ -59,6 +69,7 @@ def parse_qmdl(plainTextFile):
             print "-----------------------------------------------------------"
 
         for CellIdentityCombine, CellInfo in evdo_mobility_misconfig_serving_cell_dict.iteritems():
+            CellIdentityCombine = (carrier,) + CellIdentityCombine
             print CellIdentityCombine
             InfoKey = "evdo_sector_parameters"
             if InfoKey in CellInfo:
