@@ -184,6 +184,7 @@ def Flush():
             'Cell Identity': 'Null',
             'timestamp': 'Null',
             'bandIndicator': 'Null',
+            'startingARFCN': 'Null',
             'cellReselectionPriority': 'Null',
             'q_RxLevMin': 'Null',
             'p_MaxGERAN': 'Null',

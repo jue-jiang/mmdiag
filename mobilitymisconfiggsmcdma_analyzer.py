@@ -118,7 +118,7 @@ class MobilityMisconfigGsmCdmaAnalyzer(Analyzer):
                 self.__gsm_last_geolocation['lon'] = 'None'
 
             self.__gsm_mobility_misconfig_serving_cell_dict[("GSM", self.__gsm_last_mcc, self.__gsm_last_mnc, self.__gsm_last_lac, self.__gsm_last_cid, self.__gsm_last_bsicncc, self.__gsm_last_bsicbcc)]["gsm_geolocation"] = self.__gsm_last_geolocation
-        log_item['timestamp'] = "'" + str(log_item['timestamp']) + "'"
+        log_item['timestamp'] = str(log_item['timestamp'])
         log_item.update(self.__gsm_last_geolocation)
         # command = ['python', '/home/deng164/milab-server/manage.py', 'update_gsm_cellinfo',
         #     "GSM", self.__gsm_last_mcc, self.__gsm_last_mnc, self.__gsm_last_lac, self.__gsm_last_cid, self.__gsm_last_bsicncc, self.__gsm_last_bsicbcc,
@@ -151,7 +151,7 @@ class MobilityMisconfigGsmCdmaAnalyzer(Analyzer):
         log_item = event.data
         if self.__gsm_last_cid is None:
             return
-        log_item['timestamp'] = "'" + str(log_item['timestamp']) + "'"
+        log_item['timestamp'] = str(log_item['timestamp'])
         # command = ['python', '/home/deng164/milab-server/manage.py', 'update_gsm_reselectparms',
         #     "GSM", self.__gsm_last_mcc, self.__gsm_last_mnc, self.__gsm_last_lac, self.__gsm_last_cid, self.__gsm_last_bsicncc, self.__gsm_last_bsicbcc,
         #     str(log_item['Cell Reselection Hysteresis']),
@@ -202,7 +202,7 @@ class MobilityMisconfigGsmCdmaAnalyzer(Analyzer):
                 self.__cdma_last_geolocation['city'] = 'None'
 
             self.__cdma_mobility_misconfig_serving_cell_dict[("RTT", self.__cdma_last_SID, self.__cdma_last_NID, self.__cdma_last_BaseID)]["cdma_geolocation"] = self.__cdma_last_geolocation
-        log_item['timestamp'] = "'" + str(log_item['timestamp']) + "'"
+        log_item['timestamp'] = str(log_item['timestamp'])
         log_item.update(self.__cdma_last_geolocation)
         # print "cdma_systemParameters, SID: %s, NID: %s, BaseID: %s, country: %s, state: %s, city: %s, lat: %s, lon: %s" % (
         # "RTT", self.__cdma_last_SID, self.__cdma_last_NID, self.__cdma_last_BaseID,
@@ -262,7 +262,7 @@ class MobilityMisconfigGsmCdmaAnalyzer(Analyzer):
                     self.__evdo_last_geolocation['city'] = 'None'
 
                 self.__evdo_mobility_misconfig_serving_cell_dict[("EVDO", self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]["evdo_geolocation"] = self.__evdo_last_geolocation
-            log_item['timestamp'] = "'" + str(log_item['timestamp']) + "'"
+            log_item['timestamp'] = str(log_item['timestamp'])
             log_item.update(self.__evdo_last_geolocation)
 
             if "evdo_sector_parameters" not in self.__evdo_mobility_misconfig_serving_cell_dict[("EVDO", self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)]:
@@ -274,7 +274,7 @@ class MobilityMisconfigGsmCdmaAnalyzer(Analyzer):
                 pass
             if ("EVDO", self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID) not in self.__evdo_mobility_misconfig_serving_cell_dict.keys():
                 self.__evdo_mobility_misconfig_serving_cell_dict[("EVDO", self.__evdo_last_CountryCode, self.__evdo_last_SubnetID, self.__evdo_last_SectorID)] = {}
-            info['timestamp'] = "'" + str(log_item['timestamp']) + "'"
+            info['timestamp'] = str(log_item['timestamp'])
             if int(log_item['Num Other RAT']) > 0:
                 otherRATs = log_item['Other RATs']
                 for rat in otherRATs:

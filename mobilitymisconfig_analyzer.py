@@ -1372,7 +1372,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
                         s = attr.get("showname")
                         if attr.get("name") in ("lte-rrc.bandIndicator", "lte-rrc.q_RxLevMin", "lte-rrc.threshX_High", "lte-rrc.threshX_Low"):
                             info[attr.get("name")[8:]] = re.findall(Pattern1, s)[0]
-                        elif attr.get("name") in ("lte-rrc.cellReselectionPriority", "lte-rrc.p_MaxGERAN"):
+                        elif attr.get("name") in ("lte-rrc.cellReselectionPriority", "lte-rrc.p_MaxGERAN", "lte-rrc.startingARFCN"):
                             info[attr.get("name")[8:]] = re.findall(Pattern2, s)[0]
                     try:
                         self.__last_CellID
