@@ -86,6 +86,12 @@ def processSibs(primKey,secKey,line):
                 ServCell =  copyVals(ServCell,eval(line))
                 # print ServCell
                 # sys.exit()
+            elif secKey[1:5]=='sib4':
+                global SIB4
+                SIB4 =  copyVals(SIB4,eval(line))
+                writeDB(SIB4,globalFileNames['SIB4'])
+                # print SIB4
+                # sys.exit()
             elif secKey[1:5]=='sib5':
                 global SIB5
                 SIB5 =  copyVals(SIB5,eval(line))
@@ -140,7 +146,7 @@ def process3g(primKey,secKey,line):
         pass
         print line
         # print
-    
+
 def Flush():
     global ServCell
     global SIB5
@@ -151,19 +157,19 @@ def Flush():
     global Events
 
     ServCell = {'Uplink bandwidth': 'Null', 'city': 'Null', 'Band Indicator': 'Null', 'timestamp': 'Null',
-     'MCC': 'Null', 'lon': 'Null', 'country': 'Null', 'state': 'Null', 'Downlink bandwidth': 'Null', 
-     'Cell Identity': 'Null', 'lat': 'Null', 'Uplink frequency': 'Null', 'Downlink frequency': 'Null', 
-     'MNC': 'Null', 'TAC': 'Null','Allowed Access': 'Null','q_Hyst':'Null','threshServingLow': 'Null', 
-     'cellReselectionPriority': 'Null', 's_NonIntraSearch': 'Null', 't_ReselectionEUTRA': 'Null', 
-     's_IntraSearch': 'Null', 'p_Max': 'Null', 'q_RxLevMin': 'Null','Cell ID': 'Null'}
+    'MCC': 'Null', 'lon': 'Null', 'country': 'Null', 'state': 'Null', 'Downlink bandwidth': 'Null',
+    'Cell Identity': 'Null', 'lat': 'Null', 'Uplink frequency': 'Null', 'Downlink frequency': 'Null',
+    'MNC': 'Null', 'TAC': 'Null','Allowed Access': 'Null','q_Hyst':'Null','threshServingLow': 'Null',
+    'cellReselectionPriority': 'Null', 's_NonIntraSearch': 'Null', 't_ReselectionEUTRA': 'Null',
+    's_IntraSearch': 'Null', 'p_Max': 'Null', 'q_RxLevMin': 'Null','Cell ID': 'Null'}
 
-    SIB5 = {'Cell Identity': 'Null','MNC': 'Null','MCC': 'Null','TAC': 'Null','timestamp': 'Null', 
-    'threshX_High': 'Null', 'threshX_Low': 'Null', 'q_RxLevMin': 'Null', 
-    'dl_CarrierFreq': 'Null', 't_ReselectionEUTRA': 'Null', 'cellReselectionPriority': 'Null', 
-    'p_Max': 'Null', 'allowedMeasBandwidth': 'Null'}
+    SIB5 = {'Cell Identity': 'Null','MNC': 'Null','MCC': 'Null','TAC': 'Null','timestamp': 'Null',
+    'threshX_High': 'Null', 'threshX_Low': 'Null', 'q_RxLevMin': 'Null',
+    'dl_CarrierFreq': 'Null', 't_ReselectionEUTRA': 'Null', 'cellReselectionPriority': 'Null',
+    'p_Max': 'Null', 'allowedMeasBandwidth': 'Null', 'q_OffsetFreq': 'Null'}
 
     SIB6 = {'Cell Identity': 'Null','MNC': 'Null','MCC': 'Null','TAC': 'Null','timestamp': 'Null',
-    'p_MaxUTRA': 'Null', 'carrierFreq': 'Null', 'threshX_High': 'Null', 'q_RxLevMin': 'Null', 
+    'p_MaxUTRA': 'Null', 'carrierFreq': 'Null', 'threshX_High': 'Null', 'q_RxLevMin': 'Null',
     'lte_rrc_freq': 'Null', 'q_QualMin': 'Null', 'cellReselectionPriority': 'Null', 'threshX_Low': 'Null'}
 
     SIB8 = {'Cell Identity': 'Null','MNC': 'Null','MCC': 'Null','TAC': 'Null','timestamp': 'Null',

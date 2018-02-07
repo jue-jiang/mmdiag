@@ -108,12 +108,22 @@ def parse_qmdl(path_input):
                 print InfoKey
                 for InfoValueItem in CellInfo[InfoKey]:
                     print InfoValueItem
+            InfoKey = "[sib4]intraFreqNeighCellList"
+            if InfoKey in CellInfo:
+                print InfoKey
+                for InfoValueItem in CellInfo[InfoKey]:
+                    print InfoValueItem
             InfoKey = "[sib5]InterFreqCarrierFreqInfo_element"
             if InfoKey in CellInfo:
                 print InfoKey
                 for InfoValueItem in CellInfo[InfoKey]:
                     print InfoValueItem
             InfoKey = "[sib5]interFreqBlackCellList"
+            if InfoKey in CellInfo:
+                print InfoKey
+                for InfoValueItem in CellInfo[InfoKey]:
+                    print InfoValueItem
+            InfoKey = "[sib5]interFreqNeighCellList"
             if InfoKey in CellInfo:
                 print InfoKey
                 for InfoValueItem in CellInfo[InfoKey]:
