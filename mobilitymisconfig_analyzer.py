@@ -1197,7 +1197,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
             Pattern2 = re.compile(r": (.*)$")
 
         if is_sib1:
-            info = {"q_RxLevMin": "Unknown", "q_RxLevMinOffset": "Unknown", "p_Max": "Unknown"}
+            info = {"q_RxLevMin": "Not Present", "q_RxLevMinOffset": "Not Present", "p_Max": "Not Present"}
             for val in log_xml.iter("field"):
                 if val.get("name") == "lte-rrc.cellSelectionInfo_element":
                     for attr in val.iter("field"):
@@ -1306,6 +1306,24 @@ class MobilityMisconfigAnalyzer(Analyzer):
                             info[attr.get("name")[8:]] = re.findall(Pattern1, s)[0]
                         elif attr.get("name") in ("lte-rrc.dl_CarrierFreq", "lte-rrc.p_Max", "lte-rrc.t_ReselectionEUTRA", "lte-rrc.cellReselectionPriority"):
                             info[attr.get("name")[8:]] = re.findall(Pattern2, s)[0]
+                        elif attr.get("name") == "lte-rrc.PhysCellIdRange_element" and "dl_CarrierFreq" in info:
+                            blackCellListInfo = dict()
+                            blackCellListInfo["dl_CarrierFreq"] = info["dl_CarrierFreq"]
+                            # Iter over all attrs
+                            for subAttr in attr.iter("field"):
+                                if subAttr.get("name") in ("lte-rrc.start"):
+                                    s = subAttr.get("showname")
+                                    blackCellListInfo[subAttr.get("name")[8:]] = re.findall(Pattern2, s)[0]
+                            try:
+                                self.__last_CellID
+                            except AttributeError:
+                                pass
+                            else:
+                                if "[sib5]interFreqBlackCellList" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)].keys():
+                                    if blackCellListInfo not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]interFreqBlackCellList"]:
+                                        self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]interFreqBlackCellList"].append(blackCellListInfo)
+                                else:
+                                    self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]interFreqBlackCellList"] = [blackCellListInfo]
                     try:
                         self.__last_CellID
                     except AttributeError:
@@ -1316,23 +1334,6 @@ class MobilityMisconfigAnalyzer(Analyzer):
                                 self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]InterFreqCarrierFreqInfo_element"].append(info)
                         else:
                             self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]InterFreqCarrierFreqInfo_element"] = [info]
-                if val.get("name") == "lte-rrc.PhysCellIdRange_element":
-                    info = dict()
-                    # Iter over all attrs
-                    for attr in val.iter("field"):
-                        if attr.get("name") in ("lte-rrc.start"):
-                            s = attr.get("showname")
-                            info[attr.get("name")[8:]] = re.findall(Pattern2, s)[0]
-                    try:
-                        self.__last_CellID
-                    except AttributeError:
-                        pass
-                    else:
-                        if "[sib5]interFreqBlackCellList" in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)].keys():
-                            if info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]interFreqBlackCellList"]:
-                                self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]interFreqBlackCellList"].append(info)
-                        else:
-                            self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["[sib5]interFreqBlackCellList"] = [info]
 
         if is_sib6:
             # Iter over all CarrierFreqUTRA_FDD elements
@@ -1450,7 +1451,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
                         field_val = {}
 
                         field_val['lte-rrc.carrierFreq'] = 0
-                        field_val['lte-rrc.offsetFreq'] = 0
+                        field_val['lte-rrc.offsetFreq'] = "Not Present"
 
                         for val in field.iter('field'):
                             field_val[val.get('name')] = val.get('show')
