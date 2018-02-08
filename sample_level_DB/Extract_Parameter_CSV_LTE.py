@@ -49,6 +49,7 @@ def processSibs(primKey,secKey,line):
                 for each in table["lte_measurement_report_config"]:
                     measReport = eval(each)
                     if currReportId == measReport["reportConfigId"]:
+                        reportConfig["measObjectId"] = measReport["measObjectId"]
                         objVal = measReport["measObjectId"]
                         for eachObj in table[objType]:
                             currObj = eval(eachObj)
@@ -201,7 +202,8 @@ def Flush():
 
     Events = {'Cell Identity': 'Null','MNC': 'Null','MCC': 'Null','TAC': 'Null','timestamp': 'Null', 'offset': 'Null',
     'hyst': 'Null', 'event_type': 'Null', 'threshold1': 'Null', 'threshold2': 'Null', 'freq': 'Null',
-    'report_id': 'Null','threshold': 'Null', 'timeToTrigger':'Null', 'reportInterval':'Null', 'reportAmount':'Null'}
+    'report_id': 'Null','threshold': 'Null', 'timeToTrigger':'Null', 'reportInterval':'Null', 'reportAmount':'Null',
+    'measObjectId': 'Null'}
 
 def copyVals(To,From):
     for eachKey in From:
