@@ -1325,11 +1325,11 @@ class MobilityMisconfigAnalyzer(Analyzer):
                         elif attr.get("name") in ("lte-rrc.dl_CarrierFreq", "lte-rrc.p_Max", "lte-rrc.t_ReselectionEUTRA", "lte-rrc.cellReselectionPriority"):
                             info[attr.get("name")[8:]] = re.findall(Pattern2, s)[0]
                         elif attr.get("name") == "lte-rrc.PhysCellIdRange_element" and "dl_CarrierFreq" in info:
-                            blackCellListInfo = dict()
+                            blackCellListInfo = {"start": "Not Present", "range": "Not Present"}
                             blackCellListInfo["dl_CarrierFreq"] = info["dl_CarrierFreq"]
                             # Iter over all attrs
                             for subAttr in attr.iter("field"):
-                                if subAttr.get("name") in ("lte-rrc.start"):
+                                if subAttr.get("name") in ("lte-rrc.start", "lte-rrc.range"):
                                     s = subAttr.get("showname")
                                     blackCellListInfo[subAttr.get("name")[8:]] = re.findall(Pattern2, s)[0]
                             try:

@@ -87,12 +87,22 @@ def processSibs(primKey,secKey,line):
                 ServCell =  copyVals(ServCell,eval(line))
                 # print ServCell
                 # sys.exit()
-            elif secKey[1:5]=='sib4':
-                global SIB4
-                SIB4 =  copyVals(SIB4,eval(line))
-                writeDB(SIB4,globalFileNames['SIB4'])
-                # print SIB4
-                # sys.exit()
+            elif secKey =='[sib4]intraFreqNeighCellList':
+                global SIB4NeighCell
+                SIB4NeighCell =  copyVals(SIB4NeighCell,eval(line))
+                writeDB(SIB4NeighCell,globalFileNames['SIB4NeighCell'])
+            elif secKey =='[sib4]intraFreqBlackCellList':
+                global SIB4BlackCell
+                SIB4BlackCell =  copyVals(SIB4BlackCell,eval(line))
+                writeDB(SIB4BlackCell,globalFileNames['SIB4BlackCell'])
+            elif secKey =='[sib5]interFreqNeighCellList':
+                global SIB5NeighCell
+                SIB5NeighCell =  copyVals(SIB5NeighCell,eval(line))
+                writeDB(SIB5NeighCell,globalFileNames['SIB5NeighCell'])
+            elif secKey =='[sib5]interFreqBlackCellList':
+                global SIB5BlackCell
+                SIB5BlackCell =  copyVals(SIB5BlackCell,eval(line))
+                writeDB(SIB5BlackCell,globalFileNames['SIB5BlackCell'])
             elif secKey[1:5]=='sib5':
                 global SIB5
                 SIB5 =  copyVals(SIB5,eval(line))
@@ -103,7 +113,6 @@ def processSibs(primKey,secKey,line):
                 global SIB6
                 SIB6 =  copyVals(SIB6,eval(line))
                 writeDB(SIB6,globalFileNames['SIB6'])
-
                 # print SIB6
                 # sys.exit()
             elif secKey[1:5]=='sib8':
@@ -120,7 +129,6 @@ def processSibs(primKey,secKey,line):
                 global SIB7
                 SIB7 =  copyVals(SIB7,eval(line))
                 writeDB(SIB7,globalFileNames['SIB7'])
-
 
             # elif secKey=='2g3g_report_reconfiguration' or secKey=="lte_report_configuration":
             # elif secKey.startswith('lte_'):
@@ -156,6 +164,10 @@ def Flush():
     global SIB1
     global SIB7
     global Events
+    global SIB4NeighCell
+    global SIB4BlackCell
+    global SIB5NeighCell
+    global SIB5BlackCell
 
     ServCell = {'Uplink bandwidth': 'Null', 'city': 'Null', 'Band Indicator': 'Null', 'timestamp': 'Null',
     'MCC': 'Null', 'lon': 'Null', 'country': 'Null', 'state': 'Null', 'Downlink bandwidth': 'Null',
@@ -205,6 +217,44 @@ def Flush():
     'report_id': 'Null','threshold': 'Null', 'timeToTrigger':'Null', 'reportInterval':'Null', 'reportAmount':'Null',
     'measObjectId': 'Null'}
 
+    SIB4NeighCell = {
+            'MCC': 'Null',
+            'MNC': 'Null',
+            'TAC': 'Null',
+            'Cell Identity': 'Null',
+            'physCellId': 'Null',
+            'q_OffsetCell': 'Null',
+            }
+
+    SIB4BlackCell = {
+            'MCC': 'Null',
+            'MNC': 'Null',
+            'TAC': 'Null',
+            'Cell Identity': 'Null',
+            'start': 'Null',
+            'range': 'Null',
+            }
+
+    SIB5NeighCell = {
+            'MCC': 'Null',
+            'MNC': 'Null',
+            'TAC': 'Null',
+            'Cell Identity': 'Null',
+            'dl_CarrierFreq': 'Null',
+            'physCellId': 'Null',
+            'q_OffsetCell': 'Null',
+            }
+
+    SIB5BlackCell = {
+            'MCC': 'Null',
+            'MNC': 'Null',
+            'TAC': 'Null',
+            'Cell Identity': 'Null',
+            'dl_CarrierFreq': 'Null',
+            'start': 'Null',
+            'range': 'Null',
+            }
+
 def copyVals(To,From):
     for eachKey in From:
         if eachKey in To:
@@ -249,7 +299,7 @@ if __name__ == "__main__":
     for root, dirs, files in os.walk(sys.argv[1]):
         for f in files:
             resultFile.append(os.path.join(root, f))
-            
+
     # resultFile = ['Data_In/mi2log_D1.txt']
     Flush()
     print resultFile
@@ -258,8 +308,19 @@ if __name__ == "__main__":
         # 'SIB6':'Data_Out/SIB6.csv','SIB8':'Data_Out/SIB8.csv','Events':'Data_Out/Events.csv'}
         foo = filename.split('.')[0]
         foo = 'Data_Out/'+foo.split('/')[1]
-        globalFileNames = {'ServCell':open(foo+'ServCell.csv','a+'),'SIB5':open(foo+'SIB5.csv','a+'),
-        'SIB6':open(foo+'SIB6.csv','a+'),'SIB1':open(foo+'SIB1.csv','a+'),'SIB7':open(foo+'SIB7.csv','a+'),'SIB8':open(foo+'SIB8.csv','a+'),'Events':open(foo+'Events.csv','a+')}
+        globalFileNames = {
+                'ServCell':open(foo+'ServCell.csv','a+'),
+                'SIB5':open(foo+'SIB5.csv','a+'),
+                'SIB6':open(foo+'SIB6.csv','a+'),
+                'SIB1':open(foo+'SIB1.csv','a+'),
+                'SIB7':open(foo+'SIB7.csv','a+'),
+                'SIB8':open(foo+'SIB8.csv','a+'),
+                'Events':open(foo+'Events.csv','a+'),
+                'SIB4NeighCell':open(foo+'SIB4NeighCell.csv', 'a+'),
+                'SIB4BlackCell':open(foo+'SIB4BlackCell.csv', 'a+'),
+                'SIB5NeighCell':open(foo+'SIB5NeighCell.csv', 'a+'),
+                'SIB5BlackCell':open(foo+'SIB5BlackCell.csv', 'a+'),
+                }
         globalFileNames['ServCell'].write(",".join(ServCell.keys())+'\n')
         globalFileNames['SIB5'].write(",".join(SIB5.keys())+'\n')
         globalFileNames['SIB6'].write(",".join(SIB6.keys())+'\n')
@@ -267,6 +328,10 @@ if __name__ == "__main__":
         globalFileNames['SIB7'].write(",".join(SIB7.keys())+'\n')
         globalFileNames['SIB8'].write(",".join(SIB8.keys())+'\n')
         globalFileNames['Events'].write(",".join(Events.keys())+'\n')
+        globalFileNames['SIB4NeighCell'].write(",".join(SIB4NeighCell.keys())+'\n')
+        globalFileNames['SIB4BlackCell'].write(",".join(SIB4BlackCell.keys())+'\n')
+        globalFileNames['SIB5NeighCell'].write(",".join(SIB5NeighCell.keys())+'\n')
+        globalFileNames['SIB5BlackCell'].write(",".join(SIB5BlackCell.keys())+'\n')
         currentMsgType = None
         currentRAT = None
         # Out
@@ -278,8 +343,10 @@ if __name__ == "__main__":
                 "[sib3]cellReselectionServingFreqInfo_element":{},\
                 "[sib3]intraFreqCellReselectionInfo_element":{},\
                 "[sib4]intraFreqBlackCellList":{},\
+                "[sib4]intraFreqNeighCellList":{},\
                 "[sib5]InterFreqCarrierFreqInfo_element":{},\
                 "[sib5]interFreqBlackCellList":{},\
+                "[sib5]interFreqNeighCellList":{},\
                 "[sib6]CarrierFreqUTRA_FDD_element":{},\
                 "[sib1]":{},\
                 "[sib7]":{},\
@@ -384,6 +451,10 @@ if __name__ == "__main__":
                     SIB7 = copyVals(SIB7,ServCell)
                     SIB8 = copyVals(SIB8,ServCell)
                     Events = copyVals(Events,ServCell)
+                    SIB4NeighCell = copyVals(SIB4NeighCell,ServCell)
+                    SIB4BlackCell = copyVals(SIB4BlackCell,ServCell)
+                    SIB5NeighCell = copyVals(SIB5NeighCell,ServCell)
+                    SIB5BlackCell = copyVals(SIB5BlackCell,ServCell)
                     dictCell[primKey] ={}
                 else:
                     continue
