@@ -129,13 +129,18 @@ def processSibs(primKey,secKey,line):
                 global SIB7
                 SIB7 =  copyVals(SIB7,eval(line))
                 writeDB(SIB7,globalFileNames['SIB7'])
-
-            # elif secKey=='2g3g_report_reconfiguration' or secKey=="lte_report_configuration":
-            # elif secKey.startswith('lte_'):
-            #     global Events
-            #     Events =  copyVals(Events,eventInfo)
-            #     print Events
-            #     sys.exit()
+            elif secKey == 'lte_measurement_object':
+                global offsetFreq
+                global offsetCell
+                lteObj = eval(line)
+                offsetFreq = copyVals(offsetFreq,lteObj)
+                writeDB(offsetFreq,globalFileNames['offsetFreq'])
+                offsetCell = copyVals(offsetCell,offsetFreq)
+                for eachDict in lteObj['cell_list']:
+                    # print eachDict
+                    offsetCell = copyVals(offsetCell,eachDict)
+                    writeDB(offsetCell,globalFileNames['offsetCell'])
+                    # sys.exit()
 
         except Exception as e:
             pass
@@ -163,6 +168,8 @@ def Flush():
     global SIB8
     global SIB1
     global SIB7
+    global offsetCell
+    global offsetFreq
     global Events
     global SIB4NeighCell
     global SIB4BlackCell
@@ -212,6 +219,12 @@ def Flush():
             't_ReselectionGERAN': 'Null'
             }
 
+    offsetFreq = {'Cell Identity': 'Null','MNC': 'Null','MCC': 'Null','TAC': 'Null','timestamp': 'Null',
+    'freq':'Null','offsetFreq':'Null'}
+
+    offsetCell = {'Cell Identity': 'Null','MNC': 'Null','MCC': 'Null','TAC': 'Null','timestamp': 'Null',
+    'cell_offset':'Null','cell_id':'Null','freq':'Null'}
+
     Events = {'Cell Identity': 'Null','MNC': 'Null','MCC': 'Null','TAC': 'Null','timestamp': 'Null', 'offset': 'Null',
     'hyst': 'Null', 'event_type': 'Null', 'threshold1': 'Null', 'threshold2': 'Null', 'freq': 'Null',
     'report_id': 'Null','threshold': 'Null', 'timeToTrigger':'Null', 'reportInterval':'Null', 'reportAmount':'Null',
@@ -222,6 +235,7 @@ def Flush():
             'MNC': 'Null',
             'TAC': 'Null',
             'Cell Identity': 'Null',
+            'timestamp': 'Null',
             'physCellId': 'Null',
             'q_OffsetCell': 'Null',
             }
@@ -231,6 +245,7 @@ def Flush():
             'MNC': 'Null',
             'TAC': 'Null',
             'Cell Identity': 'Null',
+            'timestamp': 'Null',
             'start': 'Null',
             'range': 'Null',
             }
@@ -240,6 +255,7 @@ def Flush():
             'MNC': 'Null',
             'TAC': 'Null',
             'Cell Identity': 'Null',
+            'timestamp': 'Null',
             'dl_CarrierFreq': 'Null',
             'physCellId': 'Null',
             'q_OffsetCell': 'Null',
@@ -250,6 +266,7 @@ def Flush():
             'MNC': 'Null',
             'TAC': 'Null',
             'Cell Identity': 'Null',
+            'timestamp': 'Null',
             'dl_CarrierFreq': 'Null',
             'start': 'Null',
             'range': 'Null',
@@ -299,13 +316,10 @@ if __name__ == "__main__":
     for root, dirs, files in os.walk(sys.argv[1]):
         for f in files:
             resultFile.append(os.path.join(root, f))
-
-    # resultFile = ['Data_In/mi2log_D1.txt']
+    # resultFile = ['Data_In/Completemilab.txt']
     Flush()
     print resultFile
     for filename in resultFile:
-        # globalFileNames = {'ServCell':'Data_Out/ServCell.csv','SIB5':'Data_Out/SIB5.csv',
-        # 'SIB6':'Data_Out/SIB6.csv','SIB8':'Data_Out/SIB8.csv','Events':'Data_Out/Events.csv'}
         foo = filename.split('.')[0]
         foo = 'Data_Out/'+foo.split('/')[1]
         globalFileNames = {
@@ -320,6 +334,8 @@ if __name__ == "__main__":
                 'SIB4BlackCell':open(foo+'SIB4BlackCell.csv', 'a+'),
                 'SIB5NeighCell':open(foo+'SIB5NeighCell.csv', 'a+'),
                 'SIB5BlackCell':open(foo+'SIB5BlackCell.csv', 'a+'),
+                'offsetFreq':open(foo+'offsetFreq.csv','a+'),
+                'offsetCell':open(foo+'offsetCell.csv','a+'),
                 }
         globalFileNames['ServCell'].write(",".join(ServCell.keys())+'\n')
         globalFileNames['SIB5'].write(",".join(SIB5.keys())+'\n')
@@ -332,6 +348,8 @@ if __name__ == "__main__":
         globalFileNames['SIB4BlackCell'].write(",".join(SIB4BlackCell.keys())+'\n')
         globalFileNames['SIB5NeighCell'].write(",".join(SIB5NeighCell.keys())+'\n')
         globalFileNames['SIB5BlackCell'].write(",".join(SIB5BlackCell.keys())+'\n')
+        globalFileNames['offsetFreq'].write(",".join(offsetFreq.keys())+'\n')
+        globalFileNames['offsetCell'].write(",".join(offsetCell.keys())+'\n')
         currentMsgType = None
         currentRAT = None
         # Out
@@ -455,6 +473,9 @@ if __name__ == "__main__":
                     SIB4BlackCell = copyVals(SIB4BlackCell,ServCell)
                     SIB5NeighCell = copyVals(SIB5NeighCell,ServCell)
                     SIB5BlackCell = copyVals(SIB5BlackCell,ServCell)
+                    offsetFreq = copyVals(offsetFreq,ServCell)
+                    offsetCell= copyVals(offsetCell,ServCell)
+
                     dictCell[primKey] ={}
                 else:
                     continue
@@ -490,15 +511,3 @@ if __name__ == "__main__":
 
             counter +=1
             if counter % 10000==0: print counter
-
-
-        # print dictCell
-        # print dict3gCell
-
-        # for writing to files
-        # outFile = open('Data_Out/' + filename.split('/')[-1],'w+')
-        # outFile.write(str(dictCell))
-        # outFile.write('\n')
-        # outFile.write(str(dict3gCell))
-        # sys.exit()
-
