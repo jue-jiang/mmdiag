@@ -50,7 +50,7 @@ def parse_qmdl(path_input):
     m = MobilityMisconfigAnalyzer()
 
     for f in logs:
-        # print "=== %s ===" % f
+        print "=== %s ===" % f
         m.reset()
         m.set_source(src)
         src.set_input_path(f)

@@ -439,7 +439,7 @@ if __name__ == "__main__":
                     dictCell = {}
                 continue
 
-            if line == "-----------------------------------------------------------" or line == "{}" or line[:11] == "(MI)Unknown":
+            if line == "-----------------------------------------------------------" or line == "{}" or line[:11] == "(MI)Unknown" or line[:3] == "===":
                 continue
 
             #  changed here

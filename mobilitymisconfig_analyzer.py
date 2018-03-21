@@ -1484,7 +1484,6 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 report_id = -1
 
                 for field in log_xml.iter('field'):
-
                     if field.get('name') == "lte-rrc.measObjectId":
                         measobj_id = field.get('show')
 
@@ -1495,14 +1494,18 @@ class MobilityMisconfigAnalyzer(Analyzer):
                     if field.get('name') == "lte-rrc.measObjectEUTRA_element":
                         field_val = {}
 
-                        field_val['lte-rrc.carrierFreq'] = 0
-                        field_val['lte-rrc.offsetFreq'] = "Not Present"
-
                         for val in field.iter('field'):
                             field_val[val.get('name')] = val.get('showname')
 
-                        freq = re.findall(Pattern2, field_val['lte-rrc.carrierFreq'])[0]
-                        offsetFreq = re.findall(Pattern1, field_val['lte-rrc.offsetFreq'])[0]
+                        freq = 0
+                        offsetFreq = "Not Present"
+
+                        if ('lte-rrc.offsetFreq' in field_val):
+                            offsetFreq = re.findall(Pattern1, field_val['lte-rrc.offsetFreq'])[0]
+
+                        if ('lte-rrc.carrierFreq' in field_val):
+                            freq = re.findall(Pattern2, field_val['lte-rrc.carrierFreq'])[0]
+
                         new_info = {}
                         new_info = {"measobj_id":measobj_id,"freq":freq,"offsetFreq":offsetFreq}
                         new_info["cell_list"] = []
@@ -1518,6 +1521,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
                                     cell_id = re.findall(Pattern2, cell_val['lte-rrc.physCellId'])[0]
                                     cell_offset = re.findall(Pattern1, cell_val['lte-rrc.cellIndividualOffset'])[0]
                                     new_info["cell_list"].append({"cell_id":cell_id,"cell_offset":cell_offset})
+
                         if "lte_measurement_object" not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID, self.__last_DLFreq,self.__last_lte_distinguisher)]:
                             self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_measurement_object"] = []
                         if new_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_measurement_object"]:
@@ -1649,7 +1653,6 @@ class MobilityMisconfigAnalyzer(Analyzer):
                             self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_report_configuration"] = []
                         if new_info not in self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_report_configuration"]:
                             self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["lte_report_configuration"].append(new_info)
-
 
                     #Add a 2G/3G report configuration
                     if field.get('name') == "lte-rrc.reportConfigInterRAT_element":
