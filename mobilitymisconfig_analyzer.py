@@ -1163,7 +1163,7 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 else:
                     self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["plmn_Identity_element"] = [cell_info]
 
-        elif log_item["PDU Number"] == 6 or log_item["PDU Number"] == 13: # LTE-RRC_DL_DCCH
+        elif (log_item["Pkt Version"] < 15 and (log_item["PDU Number"] == 6 or log_item["PDU Number"] == 13)) or (log_item["Pkt Version"] >=15 and log_item["PDU Number"] == 7): # LTE-RRC_DL_DCCH
             for val in log_xml.iter("field"):
                 if val.get("name") == "lte-rrc.rrcConnectionReconfiguration_element":
                     is_rrc_conn_reconfig = True
