@@ -1128,7 +1128,8 @@ class MobilityMisconfigAnalyzer(Analyzer):
             self.__lte_mobility_misconfig_serving_cell_dict[(CellID,DLFreq, self.__last_lte_distinguisher)] = {}
 
         cell_info = {"plmn": None, "tac": None, "cell_id": None}
-        if log_item["PDU Number"] == 2 or log_item["PDU Number"] == 9: # BCCH_DL_SCH, orignal 2
+        if ((log_item["Pkt Version"] < 15 and (log_item["PDU Number"] == 2 or log_item["PDU Number"] == 9)) or (log_item["Pkt Version"] >= 15 and log_item["PDU Number"] == 2)):
+            # BCCH_DL_SCH, orignal 2
             for val in log_xml.iter("field"):
                 if val.get("name") == "lte-rrc.systemInformationBlockType1_element":
                     is_sib1 = True
@@ -1163,13 +1164,15 @@ class MobilityMisconfigAnalyzer(Analyzer):
                 else:
                     self.__lte_mobility_misconfig_serving_cell_dict[(self.__last_CellID,self.__last_DLFreq,self.__last_lte_distinguisher)]["plmn_Identity_element"] = [cell_info]
 
-        elif (log_item["Pkt Version"] < 15 and (log_item["PDU Number"] == 6 or log_item["PDU Number"] == 13)) or (log_item["Pkt Version"] >=15 and log_item["PDU Number"] == 7): # LTE-RRC_DL_DCCH
+        elif (log_item["Pkt Version"] < 15 and (log_item["PDU Number"] == 6 or log_item["PDU Number"] == 13)) or (log_item["Pkt Version"] >=15 and log_item["PDU Number"] == 7):
+            # LTE-RRC_DL_DCCH
             for val in log_xml.iter("field"):
                 if val.get("name") == "lte-rrc.rrcConnectionReconfiguration_element":
                     is_rrc_conn_reconfig = True
                     break
 
-        elif log_item["PDU Number"] == 8 or log_item["PDU Number"] == 15: # UL_DCCH
+        elif (log_item["Pkt Version"] < 15 and (log_item["PDU Number"] == 8 or log_item["PDU Number"] == 15)) or (log_item["Pkt Version"] >= 15 and log_item["PDU Number"] == 9):
+            # UL_DCCH
             for val in log_xml.iter("field"):
                 if val.get("name") == "lte-rrc.measurementReport_r8_element":
                     field_val = {}

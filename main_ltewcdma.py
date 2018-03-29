@@ -76,7 +76,10 @@ def parse_qmdl(path_input):
         lte_mobility_misconfig_serving_cell_dict = m.get_lte_mobility_misconfig_serving_cell_dict()
         utra_mobility_misconfig_serving_cell_dict = m.get_3g_mobility_misconfig_serving_cell_dict()
 
-        for CellIdentityCombine, CellInfo in lte_mobility_misconfig_serving_cell_dict.iteritems():
+        lte_mobility_misconfig_serving_cell_dict = lte_mobility_misconfig_serving_cell_dict.items()
+        lte_mobility_misconfig_serving_cell_dict = filter(lambda x: len(x[0])==3,lte_mobility_misconfig_serving_cell_dict)
+        lte_mobility_misconfig_serving_cell_dict = sorted(lte_mobility_misconfig_serving_cell_dict,key = lambda x:x[0][2])
+        for CellIdentityCombine, CellInfo in lte_mobility_misconfig_serving_cell_dict:
             print CellIdentityCombine
             InfoKey = "lte_rrc_cerv_cell_info"
             if InfoKey in CellInfo:
