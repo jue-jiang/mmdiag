@@ -72,6 +72,9 @@ def processSibs(primKey,secKey,line):
                         global Events
                         Events =  copyVals(Events,reportConfig)
                         writeDB(Events,globalFileNames['Events'])
+                        for each in Events:
+                            if each not in {"Cell Identity","MNC","MCC","TAC","timestamp"}:
+                                Events[each] = "Null"
 
                         # print Events
                         # sys.exit()
