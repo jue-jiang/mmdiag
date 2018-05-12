@@ -10,6 +10,8 @@ import subprocess
 import xml.etree.ElementTree as ET
 import datetime
 import re
+from datetime import datetime
+import datetime
 
 __all__ = ["ActiveHandoffAnalyzer"]
 
@@ -79,17 +81,76 @@ class ActiveHandoffAnalyzer(Analyzer):
         except Exception as e:
             pass
 
-    def handle_handoff(self, oldCellID, oldFreq, newCellID, newFreq):
+    def print_by_format(self, dict_info):
+        report_config = dict_info['report_config']
+        oldCell = dict_info['oldCell']
+        rsrp_oldCell = oldCell['RSRP']
+        rsrq_oldCell = oldCell['RSRQ']
+        rssi_oldCell = oldCell['RSSI']
+        newCell = dict_info['newCell']
+        rsrp_newCell = newCell['RSRP']
+        rsrq_newCell = newCell['RSRQ']
+        rssi_newCell = newCell['RSSI']
+
+        measOldCell = dict_info['measOldCell']
+        meas_rsrp_oldCell = measOldCell["lte-rrc.rsrpResult"]
+        meas_rsrq_oldCell = measOldCell["lte-rrc.rsrqResult"]
+
+        measNewCell = dict_info['measNewCell']
+        meas_rsrp_newCell = measNewCell["lte-rrc.rsrpResult"]
+        meas_rsrq_newCell = measNewCell["lte-rrc.rsrqResult"]
+
+        hyst = report_config['hyst']
+        event_list = report_config['event_list']
+        event_type = "Unknown"
+        offset = "Unknown"
+        threshold = "Unknown"
+        threshold1 = "Unknown"
+        threshold2 = "Unknown"
+
+        if len(event_list) == 0:
+            event_type = 'period'
+        else:
+            event = event_list[0]
+            event_type = event['event_type']
+            if 'offset' in event:
+                offset = event['offset']
+            if 'threshold' in event:
+                threshold = event['threshold']
+            if 'threshold1' in event:
+                threshold1 = event['threshold1']
+            if 'threshold2' in event:
+                threshold2 = event['threshold2']
+
+        strTimestamp = str(dict_info['timestamp'])
+        if "." in strTimestamp:
+            dateTimestamp = datetime.datetime.strptime(strTimestamp, '%Y-%m-%d %H:%M:%S.%f')
+        else:
+            dateTimestamp = datetime.datetime.strptime(strTimestamp, '%Y-%m-%d %H:%M:%S')
+        timestampEST = dateTimestamp - datetime.timedelta(hours=5)
+        strTimestamp = timestampEST.strftime("%Y/%m/%d/%H:%M:%S.%f")
+        print rsrp_oldCell, rsrq_oldCell, rssi_oldCell, rsrp_newCell, rsrq_newCell, rssi_newCell, event_type, hyst, offset, threshold, threshold1, threshold2, meas_rsrp_oldCell, meas_rsrq_oldCell, meas_rsrp_newCell, meas_rsrq_newCell, strTimestamp
+
+    def handle_handoff(self, oldCellID, oldFreq, newCellID, newFreq, timestamp):
         # print "reportConfig", self.__current_LTE_reportConfig
         # print "measurementObject", self.__current_LTE_measurementObject
         # print "measurementReport", self.__current_LTE_measurementReport
         # print "measurementReportConfig", self.__current_LTE_measurementReportConfig
 
         if len(self.__current_LTE_measurementReport) == 0:
-            print "no measurement report"
-            self.reset
+            # print "no measurement report"
+            self.reset()
             return
         last_measurement_report = self.__current_LTE_measurementReport[-1]
+        neighborLTECells =  last_measurement_report['neighborLTECells']
+        find_report_newCell = False
+        for cell in neighborLTECells:
+            if cell["lte-rrc.physCellId"] == int(newCellID):
+                find_report_newCell = True
+                meas_newCell = cell
+        if not find_report_newCell:
+            self.reset()
+            return
         meas_id = int(last_measurement_report['lte-rrc.measId'])
         find_report_id = False
         for meas_report_config in self.__current_LTE_measurementReportConfig:
@@ -98,8 +159,8 @@ class ActiveHandoffAnalyzer(Analyzer):
                 report_id = int(meas_report_config['reportConfigId'])
                 break
         if not find_report_id:
-            print "no report config id matched with meas_id:", meas_id
-            self.reset
+            # print "no report config id matched with meas_id:", meas_id
+            self.reset()
             return
 
         find_report_config = False
@@ -110,23 +171,32 @@ class ActiveHandoffAnalyzer(Analyzer):
                 break
 
         if not find_report_config:
-            print "no report id matched with report config id:", report_id
+            # print "no report id matched with report config id:", report_id
+            self.reset()
+            return
 
         oldCellID = str(oldCellID)
         oldFreq = str(oldFreq)
         newCellID = str(newCellID)
         newFreq = str(newFreq)
         if (oldCellID, oldFreq) not in self.__signal_strength:
-            print "no signal info for old cell", (oldCellID, oldFreq)
+            # print "no signal info for old cell", (oldCellID, oldFreq)
             self.reset()
             return
 
         if (newCellID, newFreq) in self.__signal_strength:
-            self.__waiting_for_signal = {(newCellID, newFreq): {"report_config": report_config, "oldCell": self.__signal_strength[(oldCellID, oldFreq)], "newCell": self.__signal_strength[(newCellID, newFreq)]}}
-            print self.__waiting_for_signal[(newCellID, newFreq)]
+            self.__waiting_for_signal = {(newCellID, newFreq): {"report_config": identified_report_config, "oldCell": self.__signal_strength[(oldCellID, oldFreq)], "newCell": self.__signal_strength[(newCellID, newFreq)]}}
+            self.__waiting_for_signal[(newCellID, newFreq)]["measOldCell"] = last_measurement_report
+            self.__waiting_for_signal[(newCellID, newFreq)]["measNewCell"] = meas_newCell
+            self.__waiting_for_signal[(newCellID, newFreq)]["timestamp"] = timestamp
+
+            self.print_by_format(self.__waiting_for_signal[(newCellID, newFreq)])
             self.__waiting_for_signal = {}
         else:
-            self.__waiting_for_signal = {(newCellID, newFreq): {"report_config": report_config, "oldCell": self.__signal_strength[(oldCellID, oldFreq)]}}
+            self.__waiting_for_signal = {(newCellID, newFreq): {"report_config": identified_report_config, "oldCell": self.__signal_strength[(oldCellID, oldFreq)]}}
+            self.__waiting_for_signal[(newCellID, newFreq)]["measOldCell"] = last_measurement_report
+            self.__waiting_for_signal[(newCellID, newFreq)]["measNewCell"] = meas_newCell
+            self.__waiting_for_signal[(newCellID, newFreq)]["timestamp"] = timestamp
 
         self.reset()
 
@@ -142,7 +212,7 @@ class ActiveHandoffAnalyzer(Analyzer):
         self.__signal_strength[(CellID, DLFreq)] = {"RSRP": RSRP, "RSRQ": RSRQ, "RSSI": RSSI}
         if self.__waiting_for_signal != None and (CellID, DLFreq) in self.__waiting_for_signal:
             self.__waiting_for_signal[(CellID, DLFreq)]["newCell"] = self.__signal_strength[(CellID, DLFreq)]
-            print self.__waiting_for_signal[(CellID, DLFreq)]
+            self.print_by_format(self.__waiting_for_signal[(CellID, DLFreq)])
             self.__waiting_for_signal = {}
 
 
@@ -163,8 +233,8 @@ class ActiveHandoffAnalyzer(Analyzer):
         DLFreq = log_item["Freq"]
         if self.__current_LTE_shortCellID != None:
             if self.__current_LTE_shortCellID != CellID or self.__current_LTE_freq != DLFreq:
-                print "Handoff from", (self.__current_LTE_shortCellID, self.__current_LTE_freq), "to", (CellID, DLFreq)
-                self.handle_handoff(self.__current_LTE_shortCellID, self.__current_LTE_freq, CellID, DLFreq)
+                # print "Handoff from", (self.__current_LTE_shortCellID, self.__current_LTE_freq), "to", (CellID, DLFreq)
+                self.handle_handoff(self.__current_LTE_shortCellID, self.__current_LTE_freq, CellID, DLFreq, log_item['timestamp'])
         self.__current_LTE_shortCellID = CellID
         self.__current_LTE_freq = DLFreq
 
@@ -212,11 +282,30 @@ class ActiveHandoffAnalyzer(Analyzer):
                     field_val["lte-rrc.measId"] = None
                     field_val["lte-rrc.rsrpResult"] = None
                     field_val["lte-rrc.rsrqResult"] = None
+                    neighborCells = []
                     for attr in val.iter("field"):
                         field_val[attr.get("name")] = attr.get("show")
+                        if attr.get("name") == "lte-rrc.MeasResultEUTRA_element":
+                            subfield_val = {}
+                            subfield_val["lte-rrc.physCellId"] = 0
+                            subfield_val["lte-rrc.rsrpResult"] = 0
+                            subfield_val["lte-rrc.rsrqResult"] = 0
+                            for subattr in attr.iter("field"):
+                                subfield_val[subattr.get("name")] = subattr.get("show")
+
+                            Pattern2 = re.compile(r": '(.*)'$")
+                            neighborCells.append(
+                                    {
+                                        "lte-rrc.physCellId":int(subfield_val['lte-rrc.physCellId']),
+                                        "lte-rrc.rsrpResult":int(subfield_val["lte-rrc.rsrpResult"])-140,
+                                        "lte-rrc.rsrqResult":(int(subfield_val["lte-rrc.rsrqResult"])-40)/2.0,
+                                        }
+                                    )
+                            break
                     info = {"lte-rrc.measId":field_val["lte-rrc.measId"],\
                             "lte-rrc.rsrpResult":int(field_val["lte-rrc.rsrpResult"])-140,\
-                            "lte-rrc.rsrqResult":(int(field_val["lte-rrc.rsrqResult"])-40)/2.0}
+                            "lte-rrc.rsrqResult":(int(field_val["lte-rrc.rsrqResult"])-40)/2.0,\
+                            "neighborLTECells": neighborCells}
                     try:
                         self.__current_LTE_shortCellID
                     except AttributeError:
