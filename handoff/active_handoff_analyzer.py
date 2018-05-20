@@ -30,6 +30,7 @@ class ActiveHandoffAnalyzer(Analyzer):
     def reset(self):
         self.__current_LTE_shortCellID = None
         self.__current_LTE_freq = None
+        self.__current_LTE_MCCMNC = "Unknown"
         self.__current_LTE_reportConfig = []
         self.__current_LTE_measurementObject = []
         self.__current_LTE_measurementReport = []
@@ -58,8 +59,8 @@ class ActiveHandoffAnalyzer(Analyzer):
 
         source.enable_log("LTE_RRC_OTA_Packet")
         # source.enable_log("LTE_RRC_MIB_Message_Log_Packet")
-        source.enable_log("LTE_RRC_Serv_Cell_Info")
-        source.enable_log("LTE_PHY_Serv_Cell_Measurement")
+        # source.enable_log("LTE_RRC_Serv_Cell_Info")
+        # source.enable_log("LTE_PHY_Serv_Cell_Measurement")
         # source.enable_log("LTE_NAS_EMM_State")
         # source.enable_log("LTE_NAS_ESM_OTA_Incoming_Packet")
         # source.enable_log("LTE_NAS_ESM_OTA_Outgoing_Packet")
@@ -83,14 +84,23 @@ class ActiveHandoffAnalyzer(Analyzer):
 
     def print_by_format(self, dict_info):
         report_config = dict_info['report_config']
-        oldCell = dict_info['oldCell']
-        rsrp_oldCell = oldCell['RSRP']
-        rsrq_oldCell = oldCell['RSRQ']
-        rssi_oldCell = oldCell['RSSI']
-        newCell = dict_info['newCell']
-        rsrp_newCell = newCell['RSRP']
-        rsrq_newCell = newCell['RSRQ']
-        rssi_newCell = newCell['RSSI']
+        rsrp_oldCell = "Unknown"
+        rsrq_oldCell = "Unknown"
+        rssi_oldCell = "Unknown"
+        rsrp_newCell = "Unknown"
+        rsrq_newCell = "Unknown"
+        rssi_newCell = "Unknown"
+
+        if 'oldCell' in dict_info:
+            oldCell = dict_info['oldCell']
+            rsrp_oldCell = oldCell['RSRP']
+            rsrq_oldCell = oldCell['RSRQ']
+            rssi_oldCell = oldCell['RSSI']
+        if 'newCell' in dict_info:
+            newCell = dict_info['newCell']
+            rsrp_newCell = newCell['RSRP']
+            rsrq_newCell = newCell['RSRQ']
+            rssi_newCell = newCell['RSSI']
 
         measOldCell = dict_info['measOldCell']
         meas_rsrp_oldCell = measOldCell["lte-rrc.rsrpResult"]
@@ -107,6 +117,8 @@ class ActiveHandoffAnalyzer(Analyzer):
         threshold = "Unknown"
         threshold1 = "Unknown"
         threshold2 = "Unknown"
+
+        mccmnc = dict_info["mccmnc"]
 
         if len(event_list) == 0:
             event_type = 'period'
@@ -127,11 +139,12 @@ class ActiveHandoffAnalyzer(Analyzer):
             dateTimestamp = datetime.datetime.strptime(strTimestamp, '%Y-%m-%d %H:%M:%S.%f')
         else:
             dateTimestamp = datetime.datetime.strptime(strTimestamp, '%Y-%m-%d %H:%M:%S')
-        timestampEST = dateTimestamp - datetime.timedelta(hours=5)
+        timestampEST = dateTimestamp - datetime.timedelta(hours=4)
         strTimestamp = timestampEST.strftime("%Y/%m/%d/%H:%M:%S.%f")
-        print rsrp_oldCell, rsrq_oldCell, rssi_oldCell, rsrp_newCell, rsrq_newCell, rssi_newCell, event_type, hyst, offset, threshold, threshold1, threshold2, meas_rsrp_oldCell, meas_rsrq_oldCell, meas_rsrp_newCell, meas_rsrq_newCell, strTimestamp
+        print rsrp_oldCell, rsrq_oldCell, rssi_oldCell, rsrp_newCell, rsrq_newCell, rssi_newCell, event_type, hyst, offset, threshold, threshold1, threshold2, meas_rsrp_oldCell, meas_rsrq_oldCell, meas_rsrp_newCell, meas_rsrq_newCell, strTimestamp, mccmnc
 
     def handle_handoff(self, oldCellID, oldFreq, newCellID, newFreq, timestamp):
+        # print "---------------------------------------------------------------"
         # print "reportConfig", self.__current_LTE_reportConfig
         # print "measurementObject", self.__current_LTE_measurementObject
         # print "measurementReport", self.__current_LTE_measurementReport
@@ -149,6 +162,7 @@ class ActiveHandoffAnalyzer(Analyzer):
                 find_report_newCell = True
                 meas_newCell = cell
         if not find_report_newCell:
+            # print "the latest measurement report didn't report new cell"
             self.reset()
             return
         meas_id = int(last_measurement_report['lte-rrc.measId'])
@@ -175,28 +189,63 @@ class ActiveHandoffAnalyzer(Analyzer):
             self.reset()
             return
 
+        # listMeasurementReport = []
+        # for report in self.__current_LTE_measurementReport:
+        #     isTargetCellMeasured = False
+        #     relatedEvent = "Unknown"
+        #     timestamp = report['timestamp']
+        #     for neighborLTECell in report['neighborLTECells']:
+        #         if neighborLTECell['lte-rrc.physCellId'] == int(newCellID):
+        #             isTargetCellMeasured = True
+        #     measId = int(report['lte-rrc.measId'])
+        #     reportid = -1
+        #     for meas_report_config in self.__current_LTE_measurementReportConfig:
+        #         if int(meas_report_config['measId']) == measId:
+        #             reportid = int(meas_report_config['reportConfigId'])
+        #             break
+        #     for report_config in self.__current_LTE_reportConfig:
+        #         if int(report_config['report_id']) == reportid:
+        #             if len(report_config['event_list']) > 0:
+        #                 relatedEvent = report_config['event_list'][0]['event_type']
+        #             else:
+        #                 relatedEvent = "period"
+        #             break
+        #     listMeasurementReport.append((timestamp, relatedEvent, isTargetCellMeasured))
+        #     print timestamp, relatedEvent, isTargetCellMeasured
+
         oldCellID = str(oldCellID)
         oldFreq = str(oldFreq)
         newCellID = str(newCellID)
         newFreq = str(newFreq)
-        if (oldCellID, oldFreq) not in self.__signal_strength:
-            # print "no signal info for old cell", (oldCellID, oldFreq)
-            self.reset()
-            return
 
-        if (newCellID, newFreq) in self.__signal_strength:
-            self.__waiting_for_signal = {(newCellID, newFreq): {"report_config": identified_report_config, "oldCell": self.__signal_strength[(oldCellID, oldFreq)], "newCell": self.__signal_strength[(newCellID, newFreq)]}}
-            self.__waiting_for_signal[(newCellID, newFreq)]["measOldCell"] = last_measurement_report
-            self.__waiting_for_signal[(newCellID, newFreq)]["measNewCell"] = meas_newCell
-            self.__waiting_for_signal[(newCellID, newFreq)]["timestamp"] = timestamp
+        # if (oldCellID, oldFreq) not in self.__signal_strength:
+        #     # print "no signal info for old cell", (oldCellID, oldFreq)
+        #     self.reset()
+        #     return
 
-            self.print_by_format(self.__waiting_for_signal[(newCellID, newFreq)])
-            self.__waiting_for_signal = {}
-        else:
-            self.__waiting_for_signal = {(newCellID, newFreq): {"report_config": identified_report_config, "oldCell": self.__signal_strength[(oldCellID, oldFreq)]}}
-            self.__waiting_for_signal[(newCellID, newFreq)]["measOldCell"] = last_measurement_report
-            self.__waiting_for_signal[(newCellID, newFreq)]["measNewCell"] = meas_newCell
-            self.__waiting_for_signal[(newCellID, newFreq)]["timestamp"] = timestamp
+        # if (newCellID, newFreq) in self.__signal_strength:
+        #     self.__waiting_for_signal = {(newCellID, newFreq): {"report_config": identified_report_config, "oldCell": self.__signal_strength[(oldCellID, oldFreq)], "newCell": self.__signal_strength[(newCellID, newFreq)]}}
+        #     self.__waiting_for_signal[(newCellID, newFreq)]["measOldCell"] = last_measurement_report
+        #     self.__waiting_for_signal[(newCellID, newFreq)]["measNewCell"] = meas_newCell
+        #     self.__waiting_for_signal[(newCellID, newFreq)]["timestamp"] = timestamp
+        #     self.__waiting_for_signal[(newCellID, newFreq)]["mccmnc"] = self.__current_LTE_MCCMNC
+
+        #     self.print_by_format(self.__waiting_for_signal[(newCellID, newFreq)])
+        #     self.__waiting_for_signal = {}
+        # else:
+        #     self.__waiting_for_signal = {(newCellID, newFreq): {"report_config": identified_report_config, "oldCell": self.__signal_strength[(oldCellID, oldFreq)]}}
+        #     self.__waiting_for_signal[(newCellID, newFreq)]["measOldCell"] = last_measurement_report
+        #     self.__waiting_for_signal[(newCellID, newFreq)]["measNewCell"] = meas_newCell
+        #     self.__waiting_for_signal[(newCellID, newFreq)]["timestamp"] = timestamp
+        #     self.__waiting_for_signal[(newCellID, newFreq)]["mccmnc"] = self.__current_LTE_MCCMNC
+
+        self.__waiting_for_signal = {(newCellID, newFreq): {"report_config": identified_report_config}}
+        self.__waiting_for_signal[(newCellID, newFreq)]["measOldCell"] = last_measurement_report
+        self.__waiting_for_signal[(newCellID, newFreq)]["measNewCell"] = meas_newCell
+        self.__waiting_for_signal[(newCellID, newFreq)]["timestamp"] = timestamp
+        self.__waiting_for_signal[(newCellID, newFreq)]["mccmnc"] = self.__current_LTE_MCCMNC
+        self.print_by_format(self.__waiting_for_signal[(newCellID, newFreq)])
+        self.__waiting_for_signal = {}
 
         self.reset()
 
@@ -261,6 +310,7 @@ class ActiveHandoffAnalyzer(Analyzer):
                     for digit in val.iter("field"):
                         if digit.get("name") == "lte-rrc.MCC_MNC_Digit":
                             mcc_mnc += digit.get("show")
+                    self.__current_LTE_MCCMNC = mcc_mnc
                     cell_info["plmn"] = mcc_mnc[0:3] + "-" + mcc_mnc[3:]
                 elif val.get("name") == "lte-rrc.trackingAreaCode":
                     cell_info["tac"] = int(val.get("value"), base=16)
@@ -311,6 +361,7 @@ class ActiveHandoffAnalyzer(Analyzer):
                     except AttributeError:
                         pass
                     else:
+                        info["timestamp"] = log_item['timestamp']
                         self.__current_LTE_measurementReport.append(info)
                     break
 
